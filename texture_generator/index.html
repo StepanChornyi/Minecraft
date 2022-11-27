@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    * {
+      margin: auto;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+</body>
+<script>
+  const imagesCount = 18;
+  let loadedCount = 0;
+
+  const images = [];
+  const size = 512;
+  const tileSize = 16;
+  const padding = 24;
+
+  for (let i = 0; i < imagesCount; i++) {
+    const img = images[i] = new Image();
+
+    img.onload = onImageLoaded;
+    img.src = `textures/${i}.png?no_cache_rnd=${Math.random()}`;
+  }
+
+  function onImageLoaded() {
+    loadedCount++;
+
+    if (loadedCount === imagesCount) {
+      start();
+    }
+  }
+
+  function start() {
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = size;
+    canvas.height = size;
+
+    canvas.style.width = size * 4 + 'px';
+    canvas.style.height = size * 4 + 'px';
+    canvas.style.imageRendering = 'pixelated';
+
+    setPixelated(ctx);
+
+    const w = Math.floor(size / (tileSize + padding * 2));
+    const h = Math.floor(size / (tileSize + padding * 2));
+
+    ctx.clearRect(0, 0, size, size);
+
+    for (let i = 0; i < imagesCount; i++) {
+      const x = i % w;
+      const y = Math.floor(i / w);
+      const offsetX = (tileSize + padding * 2) * x;
+      const offsetY = (tileSize + padding * 2) * y;
+
+      // ctx.fillStyle = (x + y) % 2 ? "#363535" : "#2e2e2e";
+      // ctx.fillRect(offsetX, offsetY, tileSize + padding * 2, tileSize + padding * 2);
+
+      // ctx.fillStyle = (x + y) % 2 ? "#4c4c4c" : "#403f3f";
+      // ctx.fillRect(offsetX + padding, offsetY + padding, tileSize, tileSize);
+
+      const img = images[i % images.length];
+
+      img.width = tileSize;
+      img.height = tileSize;
+
+      ctx.drawImage(img, 0, 0, 1, tileSize, offsetX, offsetY + padding, padding, tileSize);
+      ctx.drawImage(img, img.width - 1, 0, 1, tileSize, offsetX + tileSize + padding, offsetY + padding, padding, tileSize);
+      ctx.drawImage(img, 0, 0, tileSize, 1, offsetX + padding, offsetY, tileSize, padding);
+      ctx.drawImage(img, 0, img.width - 1, tileSize, 1, offsetX + padding, offsetY + tileSize + padding, tileSize, padding);
+
+      for (let j = 0; j < 4; j++) {
+        const cornerX = j % 2;
+        const cornerY = Math.floor(j / 2);
+
+        ctx.drawImage(img, (img.width - 1) * cornerX, (img.height - 1) * cornerY, 1, 1, offsetX + (tileSize + padding) * cornerX, offsetY + (tileSize + padding) * cornerY, padding, padding);
+      }
+
+      ctx.drawImage(img, offsetX + padding, offsetY + padding);
+    }
+  }
+
+  function setPixelated(context) {
+    context['imageSmoothingEnabled'] = false;       /* standard */
+    context['mozImageSmoothingEnabled'] = false;    /* Firefox */
+    context['oImageSmoothingEnabled'] = false;      /* Opera */
+    context['webkitImageSmoothingEnabled'] = false; /* Safari */
+    context['msImageSmoothingEnabled'] = false;     /* IE */
+  }
+
+</script>
+
+</html>
