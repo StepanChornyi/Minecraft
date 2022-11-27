@@ -49,6 +49,42 @@ export default class AABBPhysics {
     return maxOffset;
   }
 
+  static collidePointWithWorld(position, velocity, world) {
+    const next = new Vector3().copyFrom(position).add(velocity);
+    const nextBlockPos = next.clone().floor();
+    const block = world.getBlock(nextBlockPos.x, nextBlockPos.y, nextBlockPos.z);
+
+    if (!block || block.isAir || block.transparency === 1) {
+      position.copyFrom(next);
+      return;
+    }
+
+    const distX = nextBlockPos.x + 0.5 - next.x;
+    const distY = nextBlockPos.y + 0.5 - next.y;
+    const distZ = nextBlockPos.z + 0.5 - next.z;
+
+    const distXAbs = Math.abs(distX);
+    const distYAbs = Math.abs(distY);
+    const distZAbs = Math.abs(distZ);
+
+    position.add(velocity);
+
+
+    if (distXAbs > distYAbs && distXAbs > distZAbs) {
+      velocity.x *= -1;
+      position.x += (distX - 0.5 * sign(distX));
+    } else if (distYAbs > distXAbs && distYAbs > distZAbs) {
+      velocity.y *= -1;
+      position.y += (distY - 0.5 * sign(distY));
+    } else {
+      velocity.z *= -1;
+      position.z += (distZ - 0.5 * sign(distZ));
+    }
+
+
+    velocity.multiplyScalar(0.3);
+  }
+
   static AA_BB(boxA, boxB) {
     return AA_BB(boxA, boxB);
   }
@@ -104,4 +140,8 @@ function getMinDist(boxA, boxB, outVector = new Vector3()) {
 
 function getMinDist1D(aMin, aMax, bMin, bMax) {
   return ((aMin + aMax) * 0.5 - (bMin + bMax) * 0.5 < 0) ? bMin - aMax : bMax - aMin;
+}
+
+function sign(v) {
+  return v < 0 ? -1 : 1;
 }

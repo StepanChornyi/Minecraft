@@ -44,7 +44,7 @@ export default class BlockMeshGenerator extends MeshGenerator {
 
         let { lb, ls, ao } = this.getVertexLight(blocks, data.normal, vertNormal, sideBlock);
 
-        mesh.vertices[i + 5] = (mesh.vertices[i + 5] * 0.1 + (Math.max(lb, ls) / MAX_LIGHT) * 0.9) * ao;
+        mesh.vertices[i + 5] = (mesh.vertices[i + 5] * 0.1 + (Math.max(lb, ls) / MAX_LIGHT) * 0.9*data.light) * ao;
 
         cornerAo.push(mesh.vertices[i + 5]);
 
@@ -107,7 +107,7 @@ const blockData = {
   },
   left: {
     normal: [-1, 0, 0],
-    light: 0.85,
+    light: 0.95,
     vertices: [
       -1.0, 1.0, 1.0, 1, 0,
       -1.0, -1.0, 1.0, 1, 1,
@@ -127,7 +127,7 @@ const blockData = {
   },
   right: {
     normal: [1, 0, 0],
-    light: 0.85,
+    light: 0.95,
     vertices: [
       1.0, 1.0, 1.0, 0, 0,
       1.0, -1.0, 1.0, 0, 1,
@@ -147,7 +147,7 @@ const blockData = {
   },
   front: {
     normal: [0, 0, 1],
-    light: 0.75,
+    light: 0.9,
     vertices: [
       1.0, 1.0, 1.0, 1, 0,
       1.0, -1.0, 1.0, 1, 1,
@@ -167,7 +167,7 @@ const blockData = {
   },
   back: {
     normal: [0, 0, -1],
-    light: 0.75,
+    light: 0.9,
     vertices: [
       1.0, 1.0, -1.0, 0, 0,
       1.0, -1.0, -1.0, 0, 1,
@@ -187,7 +187,7 @@ const blockData = {
   },
   bottom: {
     normal: [0, -1, 0],
-    light: 0.65,
+    light: 0.85,
     vertices: [
       -1.0, -1.0, -1.0, 0, 0,
       -1.0, -1.0, 1.0, 0, 1,

@@ -3,6 +3,7 @@ import { BLOCK_TYPE } from '../../block-type';
 import Vector3 from '../../../utils/vector3';
 import LightEngine from '../mesh-generator/LightEngine';
 import CONFIG from '../config';
+import ChunkTransparentMesh from '../../meshes/chunk-transparent-mesh';
 
 const CHUNK_SIZE = CONFIG.CHUNK_SIZE;
 
@@ -18,6 +19,7 @@ export default class SubChunk {
     this.blocks = [];
 
     this.mesh = new ChunkMesh(world.gl);
+    this.transparentMesh = new ChunkTransparentMesh(world.gl);
 
     //flags
     this.dirty = true;
@@ -27,6 +29,9 @@ export default class SubChunk {
   updateMesh() {
     this.meshGenerator.generateMesh(this);
     this.mesh.drawBuffersData();
+
+    this.meshGenerator.generateTransparentMesh(this);
+    this.transparentMesh.drawBuffersData();
   }
 
   getBlock(x, y, z, boundsCheck = true) {
@@ -53,13 +58,13 @@ export default class SubChunk {
     return x + y * CHUNK_SIZE + z * CHUNK_SIZE * CHUNK_SIZE;
   }
 
-  // getBlockPos(index) {
-  //   return new Vector3(
-  //     index % CHUNK_SIZE,
-  //     Math.floor(index / CHUNK_SIZE) % CHUNK_SIZE,
-  //     Math.floor(index / (CHUNK_SIZE * CHUNK_SIZE))
-  //   );
-  // }
+  getBlockXYZ(index) {
+    return new Vector3(
+      index % CHUNK_SIZE,
+      Math.floor(index / CHUNK_SIZE) % CHUNK_SIZE,
+      Math.floor(index / (CHUNK_SIZE * CHUNK_SIZE))
+    );
+  }
 
   setPos(x, y, z) {
     this.x = x;
@@ -70,9 +75,9 @@ export default class SubChunk {
   }
 
   updateMeshPos() {
-    this.mesh.x = this.x * CHUNK_SIZE;
-    this.mesh.y = this.y * CHUNK_SIZE;
-    this.mesh.z = this.z * CHUNK_SIZE;
+    this.mesh.x = this.transparentMesh.x = this.x * CHUNK_SIZE;
+    this.mesh.y = this.transparentMesh.y = this.y * CHUNK_SIZE;
+    this.mesh.z = this.transparentMesh.z = this.z * CHUNK_SIZE;
   }
 
   clearLights() {

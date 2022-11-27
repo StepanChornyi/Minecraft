@@ -24,7 +24,7 @@ void main() {
 
   vec4 vert = mView * mWorld * vec4(vertPosition, 1.0);
 
-  float dist = length(vert.xyz);
+  // float dist = length(vert.xyz);
 
   fogVal = 0.0;//clamp(-0.8 + (dist - 100.0) / 20.0, 0.0, 1.0);
 

@@ -50,9 +50,9 @@ export default class Vector3 {
   }
 
   addTo(vector3) {
-    vector3.x += this.x
-    vector3.y += this.y
-    vector3.z += this.z
+    vector3.x += this.x;
+    vector3.y += this.y;
+    vector3.z += this.z;
 
     return this;
   }
@@ -77,6 +77,14 @@ export default class Vector3 {
     this.x *= val;
     this.y *= val;
     this.z *= val;
+
+    return this;
+  }
+
+  floor() {
+    this.x = Math.floor(this.x);
+    this.y = Math.floor(this.y);
+    this.z = Math.floor(this.z);
 
     return this;
   }

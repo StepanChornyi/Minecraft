@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>GRASS</title>
+  <style>
+    * {
+      margin: auto;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="canvas"></canvas>
+</body>
+<script>
+  const img1Src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEABAMAAACuXLVVAAAAAXNSR0IB2cksfwAAAAlwSFlzAAAuIwAALiMBeKU/dgAAACdQTFRFAAD/ugULYgIEjwMF0QYJOgECSAECkQIF9wcPEnIAEGMAFocAEW8A7QeWTQAAANxJREFUeJzt2jERAjEQhtGzgAUsYOEsYAELWMACFrCABUTR7Db/DBVk7si8r9s0+8rMJMsiSZIkSZIkSZIkSZIkSZL0ZYcIAAAAAAAAYH5ALzpWp6rP1woAAAAAAABgPsAanatLdY0AAAAAAAAA5gPcor6ADF8MAAAAAAAAsBtA1xeSe/Wohi8GAAAAAAAA2A0ge1YAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPMD+oEiF36afw4DAAAAAAAA2ByQkJ5fVZ4PCwAAAAAAAGBzQEL6QyMAAAAAAADA3wLe2moaeWPHz6IAAAAASUVORK5CYII=";
+  const img2Src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAC4jAAAuIwF4pT92AAAA9UlEQVR42u2VMQ7CMAxFOQlssFRCTJ3Y2RhZ2bkAV+DUQan0Ozz0FQMSMVIjeYjt2q8/TrtaLWtZjbW/H0u1qH98nEq1aH5+AFfANaL/68bdAFoNud9dD6VaFDQfQGvYWtJ+ekR5AFzC5jKUaq6hpG8Bho8iHQALDrdxMvm1d0P5vwCSno0EorgaEYTPhz9IPwdww0Wp3x1Oxd1zeQEotSvsriPBWecFPA0Ar438PBI3nO5n5F5oBu0OQMkopRq29gQgmPb05wFgQMaGLMg896FyQ9ofgNKz0Pq8nczF5Vcej4Z5tP4AlFKFHADj9EfrzNe5N8ATuPLw1kUwVHsAAAAASUVORK5CYII=";
+
+  const img1 = new Image();
+  const img2 = new Image();
+
+  img1.onload = onImageLoaded;
+  img2.onload = onImageLoaded;
+
+  img1.src = img1Src;
+  img2.src = img2Src;
+
+  const imagesCount = 2;
+  let loadedCount = 0;
+
+  function onImageLoaded() {
+    loadedCount++;
+
+    if (loadedCount === imagesCount) {
+      start();
+    }
+  }
+
+  function start() {
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const S = 16;
+
+    canvas.width = S;
+    canvas.height = S;
+
+    canvas.style.width = canvas.width * 16 + 'px';
+    canvas.style.height = canvas.height * 16 + 'px';
+    canvas.style.imageRendering = 'pixelated';
+
+    setPixelated(ctx);
+
+    ctx.clearRect(0, 0, S, S);
+    ctx.drawImage(img2, 0, 0, S, S);
+    // ctx.fillRect(0, 0, S, S);
+
+    const tmpCanvas = document.createElement("canvas");
+    const tmpCtx = tmpCanvas.getContext("2d");
+
+    document.body.appendChild(tmpCanvas);
+
+    tmpCanvas.width = img1.width;
+    tmpCanvas.height = img1.height;
+
+    tmpCtx.drawImage(img1, 0, 0);
+
+    const imageData1 = tmpCtx.getImageData(0, 0, img1.width, img1.height);
+    const imageData2 = ctx.getImageData(0, 0, 16, 16);
+
+    for (let x = 0; x < S; x++) {
+      for (let y = 0; y < S; y++) {
+        const sX = img1.width / S;
+        const sY = img1.height / S;
+
+        const c2 = getDataXY(imageData1, Math.round((x + 0.5) * sX), Math.round((y + 0.5) * sY));
+        const c1 = getDataXY(imageData2, x, y);
+
+        if (c2.b < 230) {
+          c1.r = c2.r;
+          c1.g = c2.g;
+          c1.b = c2.b;
+          c1.a = 255;
+
+
+          setDataXY(imageData2, x, y, c1);
+        } else {
+          c1.r = 0;
+          c1.g = 0;
+          c1.b = 0;
+          c1.a = 0;
+        }
+
+        setDataXY(imageData2, x, y, c1);
+
+      }
+    }
+
+
+    setTimeout(() => {
+      ctx.putImageData(imageData2, 0, 0);
+    }, 300);
+  }
+
+  function getDataXY(imageData, x, y) {
+    const index = getDataXYIndex(imageData, x, y);
+
+    return {
+      r: imageData.data[index],
+      g: imageData.data[index + 1],
+      b: imageData.data[index + 2],
+      a: imageData.data[index + 3]
+    }
+  }
+
+  function setDataXY(imageData, x, y, colors) {
+    const index = getDataXYIndex(imageData, x, y);
+
+    imageData.data[index] = colors.r;
+    imageData.data[index + 1] = colors.g;
+    imageData.data[index + 2] = colors.b;
+    imageData.data[index + 3] = colors.a;
+  }
+
+  function getDataXYIndex(imageData, x, y) {
+    return y * 4 + x * imageData.width * 4;
+  }
+
+  function setPixelated(context) {
+    context['imageSmoothingEnabled'] = false;       /* standard */
+    context['mozImageSmoothingEnabled'] = false;    /* Firefox */
+    context['oImageSmoothingEnabled'] = false;      /* Opera */
+    context['webkitImageSmoothingEnabled'] = false; /* Safari */
+    context['msImageSmoothingEnabled'] = false;     /* IE */
+  }
+
+</script>
+
+</html>

@@ -27,6 +27,7 @@ void main() {
   // } else {
   vec3 fogColor = vec3(0.69, 0.82, 0.96);
 
+  // gl_FragColor = vec4(vec3(1.0, 1.0, 1.0) * fragLight, 1.0);
   gl_FragColor = vec4((fragColor.xyz * fragLight) * (1.0 - fogVal) + fogColor * fogVal, 1.0);
   // }
 }

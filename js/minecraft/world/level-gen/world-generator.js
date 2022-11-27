@@ -17,32 +17,9 @@ export default class WorldGenerator {
     this.worleyNoise = new Worley();
   }
 
-  fillChunk(chunk) {
-    for (let x = 0; x < CHUNK_SIZE; x++) {
-      for (let z = 0; z < CHUNK_SIZE; z++) {
-        const heightNoise = this.getHeightNoise(x + chunk.x * CHUNK_SIZE, z + chunk.z * CHUNK_SIZE);
-
-        for (let worldY = WORLD_HEIGHT - 1; worldY >= 0; worldY--) {
-          let blockType = this.getBlockType(x + chunk.x * CHUNK_SIZE, worldY, z + chunk.z * CHUNK_SIZE, heightNoise);
-
-          const upperBlock = chunk.getBlock(x, worldY + 1, z);
-
-
-          if (blockType === BLOCK_TYPE.GRASS_BLOCK && (upperBlock && !upperBlock.isAir)) {
-            blockType = BLOCK_TYPE.DIRT;
-          }
-
-          chunk.setBlock(x, worldY, z, BlocksManager.create(blockType));
-
-          // if (blockType === BLOCK_TYPE.AIR &&  y < heightNoise) {
-          //   chunk.lights[chunk.getBlockIndex(x, y, z)] = 0b0000000011110001;
-          // }
-        }
-      }
-    }
-  }
-
   placeTree(chunkGen) {
+    this._growCactus(chunkGen);
+
     const placeX1 = CHUNK_SIZE * 0.5 + Math.round((Math.random() * 2 - 1) * 5);
     const placeZ1 = CHUNK_SIZE * 0.5 + Math.round((Math.random() * 2 - 1) * 5);
 
@@ -90,7 +67,34 @@ export default class WorldGenerator {
     }
   }
 
-  getBlockType(x, y, z, heightNoise = this.getHeightNoise(x, z)) {
+  _growCactus(chunkGen) {
+    for (let x = 0; x < CHUNK_SIZE; x++) {
+      for (let z = 0; z < CHUNK_SIZE; z++) {
+        const biome = chunkGen.getBiome(x, z);
+
+        if (biome !== 3) {
+          continue;
+        }
+
+        const y = chunkGen.getHeightMap(x, z) + 1;
+        const block = chunkGen.getBlock(x, y, z);
+
+        if (block && block.type === BLOCK_TYPE.CACTUS) {
+          for (let i = 1; i < 3; i++) {
+            const block = chunkGen.getBlock(x, y + i, z);
+
+            if (block && block.type === BLOCK_TYPE.AIR) {
+              chunkGen.setBlock(x, y + i, z, BlocksManager.create(BLOCK_TYPE.CACTUS));
+            } else {
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  getBlockType(x, y, z, heightNoise = this.getHeightNoise(x, z), biome = 2) {
     // return this.getBlockType_LIGHT_TEST(x, y, z);
     // currHeight = CHUNK_HEIGHT - 6;
 
@@ -125,15 +129,27 @@ export default class WorldGenerator {
     const cave = this.getCavesNoise(x, y, z);
 
     if (y > heightNoise) {
-      if (Math.floor(cave * 100 % 3)) {
+      if (biome === 2) {
+        if (Math.floor(cave * 100 % 3)) {
+          return BLOCK_TYPE.AIR;
+        }
+
+        if (!Math.floor(cave * 1000 % 300)) {
+          return BLOCK_TYPE.ROSE;
+        }
+
+        return BLOCK_TYPE.GRASS;
+      } else if (biome === 3) {
+        if (!Math.floor(cave * 1000 % 100)) {
+          return BLOCK_TYPE.DEAD_BUSH;
+        }
+
+        if (!Math.floor(cave * 1000 % 97) && ((Math.abs(x) + Math.abs(z)) % 2)) {
+          return BLOCK_TYPE.CACTUS;
+        }
+
         return BLOCK_TYPE.AIR;
       }
-
-      if (!Math.floor(cave * 1000 % 300)) {
-        return BLOCK_TYPE.ROSE;
-      }
-
-      return BLOCK_TYPE.GRASS;
     }
 
     if (cave < -2) {//-3
@@ -146,15 +162,20 @@ export default class WorldGenerator {
 
 
     if (y > heightNoise - 5) {
-      // if (y === heightNoise && w < 0.01) {
-      //   return BLOCK_TYPE.WOOD;
-      // }
+      if (biome === 2) {
+        if (y === heightNoise) {
+          return BLOCK_TYPE.GRASS_BLOCK;
+        }
 
-      if (y === heightNoise) {
-        return BLOCK_TYPE.GRASS_BLOCK;
+        return BLOCK_TYPE.DIRT;
+
+      } else if (biome === 3) {
+        if (y > heightNoise - 4 + (Math.floor((Math.abs(cave) * 10) % 2) ? 1 : 0)) {
+          return BLOCK_TYPE.SAND;
+        }
+
+        return BLOCK_TYPE.SANDSTONE;
       }
-
-      return BLOCK_TYPE.DIRT;
     }
 
     const w = this.getWorley(x, y, z);

@@ -29,6 +29,8 @@ export default class World extends MessageDispatcher {
 
     this.chunksToInit = [];
 
+    this.initialChunksCreated = false;
+
     this.levelGen = new LevelGen();
     this.subChunkMeshGenerator = new ChunkMeshGenerator(this);
     this.chunkStorage = new ChunkStorage(this);
@@ -40,7 +42,7 @@ export default class World extends MessageDispatcher {
     this.initialChunksCount = null;
     this.initedChunksCount = 0;
 
-    setTimeout(() => this.init(), 50);
+    this.init();
   }
 
   init() {
@@ -67,8 +69,8 @@ export default class World extends MessageDispatcher {
 
         // this.worldGenerator.fillChunk(chunk);
 
-        this.levelGen.generateChunk(x, z);
-        this.levelGen.fillChunk(chunk);
+        // this.levelGen.generateChunk(x, z);
+        // this.levelGen.fillChunk(chunk);
 
         // chunk.filled = true;
 
@@ -105,6 +107,42 @@ export default class World extends MessageDispatcher {
     this.getSubChunk(chunkX, chunkY, chunkZ).dirty = true;
     this.lightEngine.update(x, y, z);
 
+    const top = this.getBlock(x, y + 1, z);
+
+    if (top) {
+      top.needsUpdate = true;
+    }
+
+    const bottom = this.getBlock(x, y - 1, z);
+
+    if (bottom) {
+      bottom.needsUpdate = true;
+    }
+
+    const left = this.getBlock(x - 1, y, z);
+
+    if (left) {
+      left.needsUpdate = true;
+    }
+
+    const right = this.getBlock(x + 1, y, z);
+
+    if (right) {
+      right.needsUpdate = true;
+    }
+
+    const front = this.getBlock(x, y, z + 1);
+
+    if (front) {
+      front.needsUpdate = true;
+    }
+
+    const back = this.getBlock(x, y, z - 1);
+
+    if (back) {
+      back.needsUpdate = true;
+    }
+
     this.getNeighborhoodSubChunks(chunkX, chunkY, chunkZ, this.getChunkDir(blockX), this.getChunkDir(blockY), this.getChunkDir(blockZ), (subChunk, d) => {
       if (subChunk) {
         if (d === 0) {
@@ -114,6 +152,16 @@ export default class World extends MessageDispatcher {
         }
       }
     });
+  }
+
+  destroy(x, y, z, newBlock = BlocksManager.create(BLOCK_TYPE.AIR)) {
+    const oldBlock = this.getBlock(x, y, z);
+
+    if (!oldBlock.isAir) {
+      this.post("showParticles", x, y, z, oldBlock.type);
+    }
+
+    this.setBlock(x, y, z, newBlock);
   }
 
   // getBlockAndLight(x, y, z) {
@@ -177,9 +225,9 @@ export default class World extends MessageDispatcher {
     return block.light;
   }
 
-  getLight(x, y, z) {//used for particles
-    return this.lightEngine.getLight(this.getLightData(x, y, z));
-  }
+  // getLight(x, y, z) {//used for particles
+  //   return this.lightEngine.getLight(this.getLightData(x, y, z));
+  // }
 
   getSubChunk(subChunkX, subChunkY, subChunkZ) {
     const chunk = this.chunkStorage.get(subChunkX, subChunkZ);
@@ -285,10 +333,36 @@ export default class World extends MessageDispatcher {
 
     this.initChunksLight();
 
-    if (!isChunkFilled)
+    if (this.initedChunksCount < this.initialChunksCount) {
+      return; //// to cancel mesh generation before initial levelGen is completed
+    }
+
+    if (!isChunkFilled)//// ???
       this.updateChunks();
 
     this.spawnChunks();
+
+    for (let i = 0; i < this.chunks.length; i++) {
+      for (let j = 0; j < this.chunks[i].subChunks.length; j++) {
+        const subChunk = this.chunks[i].subChunks[j];
+
+        for (let k = 0; k < subChunk.blocks.length; k++) {
+          if (subChunk.blocks[k].needsUpdate) {
+            const pos = subChunk.getBlockXYZ(k);
+
+            pos.x += subChunk.x * CHUNK_SIZE;
+            pos.y += subChunk.y * CHUNK_SIZE;
+            pos.z += subChunk.z * CHUNK_SIZE;
+
+            subChunk.blocks[k].update(this, pos);
+          }
+        }
+      }
+    }
+  }
+
+  updateBlocks() {
+
   }
 
   initChunk() {
@@ -434,7 +508,7 @@ export default class World extends MessageDispatcher {
               b2 = BlocksManager.create(BLOCK_TYPE.AIR);
               b2.light = b1.light;
 
-              chunk.setBlock(x, y, z,b2);
+              chunk.setBlock(x, y, z, b2);
             }
           }
         }
@@ -463,6 +537,8 @@ export default class World extends MessageDispatcher {
       new ChunkPos(0, -1)
     ];
 
+    // const aa = performance.now();
+
     while (this.updateQueue.length) {
       const chunk = this.updateQueue.peek();
 
@@ -485,6 +561,8 @@ export default class World extends MessageDispatcher {
     }
 
     this.updateQueue.reset();
+
+    // console.log((performance.now()-aa).toFixed(2));
   }
 
   updateChunk(chunk, all = true) {

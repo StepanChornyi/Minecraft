@@ -296,8 +296,8 @@ export default class Player extends Object3D {
   }
 
   onUpdate(dt) {
-    this.camera.rotationX = HELPERS.lerp(this.camera.rotationX, this.cameraRotation[0], 0.5);
-    this.camera.rotationY = HELPERS.lerp(this.camera.rotationY, this.cameraRotation[1], 0.5);
+    this.camera.rotationX = HELPERS.lerp(this.camera.rotationX, this.cameraRotation[0], 0.6);
+    this.camera.rotationY = HELPERS.lerp(this.camera.rotationY, this.cameraRotation[1], 0.6);
 
     if (!HELPERS.isPointerLocked(document.body)) {
       for (const key in pressedKeys)

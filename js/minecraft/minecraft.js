@@ -11,7 +11,7 @@ import Raycaster from './raycaster';
 import ResizeActionComponent from '../libs/resize-action-component';
 import Vector3 from '../utils/vector3';
 import Ui from './ui/ui';
-import { BLOCK_TRANSPARENCY, BLOCK_TYPE } from './block-type';
+import { BLOCK_SOUND, BLOCK_TRANSPARENCY, BLOCK_TYPE, SOUND_VOL } from './block-type';
 import PlayerMesh from './meshes/player-mesh';
 import Blockk from './meshes/blockk';
 import SelectedBlockMesh from './meshes/selected-block-mesh';
@@ -32,7 +32,6 @@ canvas.height = window.innerHeight;
 export default class Minecraft extends DisplayObject {
   constructor() {
     super();
-
 
     // console.log(gl.getSupportedExtensions());
 
@@ -58,11 +57,14 @@ export default class Minecraft extends DisplayObject {
 
     this.ui = this.addChild(new Ui());
 
-    this.lastUpdateTime = performance.now();
-
     this.ui.visible = false;
 
     this.isPaused = false;
+
+    this._startTime = Date.now();
+
+    this._lastFrameTime = 0;
+    this._frameTime = 0;
 
     this.init();
     this.start();
@@ -90,13 +92,16 @@ export default class Minecraft extends DisplayObject {
     this.loadingMesh.render(this.camera);
 
     this.world.on('initProgress', (_, val) => {
-      this.loadingMesh.setProgress(val);
+      document.getElementById("loadingBar").style.width = `${Math.min(1, val * 1.05) * 100}%`;
+      document.getElementById("loading").style.display = "none"
+
+      this.loadingMesh.setProgress(Math.min(1, val * 1.05));
     });
 
     this.world.on('initCompleted', () => {
+      document.getElementById("loading").style.display = "none"
       this.loadingMesh.visible = false;
       this.ui.visible = true;
-      this.lastUpdateTime = performance.now();
 
       // setTimeout(() => {
       //   const torchX = 2;
@@ -118,6 +123,10 @@ export default class Minecraft extends DisplayObject {
     player.cameraRotation[0] = 0//-Math.PI * 0.3;
     player.cameraRotation[1] = Math.PI * 0.25;
 
+    this.world.on("showParticles", (_, x, y, z, type) => {
+      this.particles.emit(x, y, z, type, 15);
+    });
+
     player.on('leftClick', () => {
       const intersection = this.castRayFromCamera();
 
@@ -131,11 +140,18 @@ export default class Minecraft extends DisplayObject {
         return;
       }
 
-      for (let i = 0; i < 100; i++) {
-        this.particles.emit(intersection[0] + Math.random(), intersection[1] + Math.random(), intersection[2] + Math.random());
-      }
+      this.world.destroy(intersection[0], intersection[1], intersection[2]);
 
-      this.world.setBlock(intersection[0], intersection[1], intersection[2], BlocksManager.create(BLOCK_TYPE.AIR));
+      if (BLOCK_SOUND[block.type]) {
+        const dx = intersection[0] - player.x;
+        const dy = intersection[1] - player.y;
+        const dz = intersection[2] - player.z;
+
+        const name = BLOCK_SOUND[block.type];
+        const vol = SOUND_VOL[name] * Math.min(1, 1.5 / Math.sqrt(dx * dx, dy * dy, dz * dz));
+
+        Black.audio.play(name + (Math.floor(Math.random() * 4) % 4 + 1), "master", vol);
+      }
     });
 
     player.on('rightClick', () => {
@@ -153,6 +169,17 @@ export default class Minecraft extends DisplayObject {
 
       if (intersection && (!currentBlock || currentBlock.isAir)) {
         this.world.setBlock(intersection[3], intersection[4], intersection[5], BlocksManager.create(blockType));
+
+        if (BLOCK_SOUND[blockType]) {
+          const dx = intersection[3] - player.x;
+          const dy = intersection[4] - player.y;
+          const dz = intersection[5] - player.z;
+
+          const name = BLOCK_SOUND[blockType];
+          const vol = SOUND_VOL[name] * Math.min(1, 1.5 / Math.sqrt(dx * dx, dy * dy, dz * dz));
+
+          Black.audio.play(name + (Math.floor(Math.random() * 4) % 4 + 1), "master", vol);
+        }
       }
     });
   }
@@ -163,7 +190,6 @@ export default class Minecraft extends DisplayObject {
     });
     Black.engine.on('unpaused', () => {
       this.isPaused = false;
-      this.lastUpdateTime = performance.now();
     });
 
     this.addComponent(new ResizeActionComponent(this.onResize, this));
@@ -173,6 +199,10 @@ export default class Minecraft extends DisplayObject {
     const world = this.world;
     const camera = this.camera;
 
+    this._frameTime = performance.now() - this._lastFrameTime;
+    this._lastFrameTime = performance.now();
+
+    gl.colorMask(false, false, false, false);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.colorMask(true, true, true, false);
 
@@ -194,24 +224,28 @@ export default class Minecraft extends DisplayObject {
       if (!chunk.visible)
         continue;
 
-      // if (world.chunks[i].x === chunkX && world.chunks[i].z === chunkZ) {
-      //   const intersectedBlockIndex = world.chunks[i].getBlockIndex(blockX, intersection[1], blockZ);
-
-      //   world.chunks[i].mesh.render(camera, intersectedBlockIndex);
-      //   continue;
-      // }
-
-
       for (let j = 0; j < chunk.subChunks.length; j++) {
         chunk.subChunks[j].mesh.render(camera);
       }
 
     }
 
+    this.particles.render(camera);
+
+    for (let i = 0; i < world.chunks.length; i++) {
+      const chunk = world.chunks[i];
+
+      if (!chunk.visible)
+        continue;
+
+      for (let j = 0; j < chunk.subChunks.length; j++) {
+        chunk.subChunks[j].transparentMesh.render(camera);
+      }
+    }
+
     // this.blockk.render(camera);
     // this.playerMesh.render(camera);
 
-    this.particles.render(camera);
 
     if (this.selectedBlock.visible) {
       this.selectedBlock.render(camera);
@@ -221,8 +255,9 @@ export default class Minecraft extends DisplayObject {
   }
 
   update(dt) {
-    this.world.onUpdate();
-
+    if(  (Date.now()-this._startTime)/1000 <300 ){
+      this.world.onUpdate();
+    }
     if (this.loadingMesh.visible)
       return;
 
@@ -235,7 +270,6 @@ export default class Minecraft extends DisplayObject {
     this._updateSelectedBlock();
 
     // const selectedPos = Vector3.tmp.fromArr3(this.camera.direction).multiplyScalar(3).addArr3(this.camera.position);
-
 
     // this.playerMesh.onUpdate(dt);
     // this.blockk.onUpdate(dt);
@@ -285,6 +319,7 @@ export default class Minecraft extends DisplayObject {
     const debugLog = this.ui.getDebugLog();
 
     debugLog.setPosition(this.player.x, this.player.y, this.player.z);
+    debugLog.setRenderTime(this._frameTime);
   }
 
   castRayFromCamera() {

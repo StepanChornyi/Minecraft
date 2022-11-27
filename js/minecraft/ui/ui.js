@@ -1,6 +1,6 @@
 import { Component, DisplayObject, Black, Sprite, Rectangle } from 'black-engine';
 import ResizeActionComponent from '../../libs/resize-action-component';
-import {BLOCK_TYPE} from '../block-type';
+import { BLOCK_TYPE } from '../block-type';
 import HELPERS from '../../utils/helpers';
 import DebugLog from './debug-log';
 import InventoryBar from './inventory-bar';
@@ -22,14 +22,14 @@ export default class Ui extends DisplayObject {
       BLOCK_TYPE.LEAVES,
       BLOCK_TYPE.WOOD,
       BLOCK_TYPE.TORCH,
-      BLOCK_TYPE.COBBLESTONE,
+      BLOCK_TYPE.WATER,
       BLOCK_TYPE.STONE_BRICK,
     ];
 
     this._init();
   }
 
-  getDebugLog(){
+  getDebugLog() {
     return this._debugLog;
   }
 
@@ -71,5 +71,7 @@ export default class Ui extends DisplayObject {
     inventoryBar.alignAnchor(0.5, 1);
     inventoryBar.x = bounds.center().x;
     inventoryBar.y = bounds.bottom;
+
+    this._debugLog && this._debugLog.onResize(bounds.clone());
   }
 }

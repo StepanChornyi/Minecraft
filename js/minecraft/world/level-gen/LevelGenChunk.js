@@ -6,6 +6,7 @@ const CHUNK_HEIGHT = CONFIG.CHUNK_HEIGHT;
 export default class LevelGenChunk {
   constructor() {
     this.heightMap = [];
+    this.biomeMap = [];
 
     this._blocks = [];
 
@@ -24,11 +25,23 @@ export default class LevelGenChunk {
     return x + y * CHUNK_SIZE + z * CHUNK_SIZE * CHUNK_HEIGHT;
   }
 
+  getBiome(x, z) {
+    return this.biomeMap[this._getMapIndex(x, z)];
+  }
+
+  setBiome(x, z, val) {
+    this.biomeMap[this._getMapIndex(x, z)] = val;
+  }
+
   getHeightMap(x, z) {
-    return this.heightMap[x + z * CHUNK_SIZE];
+    return this.heightMap[this._getMapIndex(x, z)];
   }
 
   setHeightMap(x, z, val) {
-    this.heightMap[x + z * CHUNK_SIZE] = val;
+    this.heightMap[this._getMapIndex(x, z)] = val;
+  }
+
+  _getMapIndex(x, z) {
+    return x + z * CHUNK_SIZE;
   }
 }

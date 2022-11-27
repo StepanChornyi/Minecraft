@@ -1,11 +1,11 @@
-import { CanvasDriver, Input, Engine, StageScaleMode } from "black-engine";
+import { CanvasDriver, Input, Engine, StageScaleMode, Black, MasterAudio } from "black-engine";
 //import { GameSpine } from "./game-spine";
 import { Game } from "./game";
 // import * as glMatrix from "./gl-matrix";
 
 document.addEventListener('contextmenu', e => e.preventDefault());
 
-const engine = new Engine('container', Game, CanvasDriver, [Input]);
+const engine = new Engine('container', Game, CanvasDriver, [Input, MasterAudio]);
 
 // Pause simulation when container loses focus
 engine.pauseOnBlur = false;

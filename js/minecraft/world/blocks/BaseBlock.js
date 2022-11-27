@@ -4,19 +4,25 @@ export default class BaseBlock {
   constructor(type) {
     this.type = type;
     this.light = 0;
+
+    this._needsUpdate = false;
   }
 
   isType(type) {
-    return this.type === type;
+    return this.is(type);
   }
-  
+
   is(type) {
     return this.type === type;
   }
 
-  reset(){
+  reset() {
     this.type = BLOCK_TYPE.AIR;
     this.light = 0;
+  }
+
+  update(world, pos) {
+    this._needsUpdate = false;
   }
 
   get isAir() {
@@ -29,6 +35,14 @@ export default class BaseBlock {
 
   get isTransparent() {
     return this.transparency !== 0;
+  }
+
+  get needsUpdate() {
+    return this._needsUpdate;
+  }
+
+  set needsUpdate(val) {
+    this._needsUpdate = val;
   }
 
   get nonTransparent() {

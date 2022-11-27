@@ -463,7 +463,7 @@ export default class LightEngine {
   _reverseProcessBlockLight(pos, dir) {
     const block = this.world.getBlock(pos.x, pos.y, pos.z);
 
-    if (block.nonTransparent) {
+    if (!block || block.nonTransparent) {
       return false;
     }
 
@@ -491,7 +491,7 @@ export default class LightEngine {
   _reverseProcessSkyLight(pos, dir) {
     const block = this.world.getBlock(pos.x, pos.y, pos.z);
 
-    if (block.nonTransparent) {
+    if (!block || block.nonTransparent) {
       return false;
     }
 

@@ -36,6 +36,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "perlin-simplex": "0.0.3",
     "primitive-sphere": "3.0.0"
   }
 }
