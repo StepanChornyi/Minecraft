@@ -32,7 +32,11 @@ module.exports = {
       test: path.resolve(__dirname, 'shaders'),
       loader: 'file-loader',
       options: { name: '[name]-[hash:8].[ext]', },
-    }, {
+    },{
+      test: /\.glsl$/i,
+      exclude: /shaders/,
+      use: 'raw-loader',
+    },{
       type: 'javascript/auto',
       test: /\.(json)/,
       exclude: /(node_modules|bower_components)/,
