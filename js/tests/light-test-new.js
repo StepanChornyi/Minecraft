@@ -6,6 +6,7 @@ const BOARD_SIZE = 60;
 const BLOCK_SIZE = 15;
 const LINE_WIDTH = 0.4;
 const MAX_LIGHT = 15;
+const DRAW_SPEED = 0.1;
 
 export class LightTestNew extends DisplayObject {
   constructor() {
@@ -253,7 +254,7 @@ export class LightTestNew extends DisplayObject {
 
   onUpdate() {
     if (this.drawQueue.length) {
-      let drawPerUpdate = Math.max(1, Math.round(this.drawQueue.length * 0.01));
+      let drawPerUpdate = Math.max(1, Math.round(this.drawQueue.length * DRAW_SPEED));
 
       for (let i = 0; this.drawQueue.length && i < drawPerUpdate; i++) {
         this.drawBlock(this.drawQueue.peek());

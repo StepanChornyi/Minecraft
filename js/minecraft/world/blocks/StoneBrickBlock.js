@@ -7,7 +7,7 @@ export default class StoneBrickBlock extends BaseBlock {
   constructor() {
     super(BLOCK_TYPE.STONE_BRICK);
 
-    this._needsUpdate = true;
+    this.needsUpdate = true;
   }
 
   update(world, pos) {

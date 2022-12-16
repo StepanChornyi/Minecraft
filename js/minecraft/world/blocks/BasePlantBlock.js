@@ -10,7 +10,7 @@ export default class BasePlantBlock extends BaseBlock {
       world.destroy(pos.x, pos.y, pos.z);
     }
 
-    this._needsUpdate = false;
+    this.needsUpdate = false;
   }
 
   checkBottom(bottomBlock, types = []) {

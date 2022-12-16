@@ -19,6 +19,7 @@ import SkyMesh from './meshes/sky-mesh';
 import ParticlesMesh from './meshes/particles-mesh';
 import BlocksManager from './world/blocks/BlocksManager';
 import CONFIG from './world/config';
+import FallingBlockEntity from './entities/FallingBlockEntity';
 
 const canvas = document.getElementById("canvas3D");
 const gl = WEBGL_UTILS.getWebGlContext(canvas);
@@ -52,6 +53,18 @@ export default class Minecraft extends DisplayObject {
     this.skyMesh = new SkyMesh(gl);
     this.blockk = new Blockk(gl, this.world);
     this.particles = new ParticlesMesh(gl, this.world);
+
+    this.entities = [];
+
+    this.world.on("createBlockEntity", (_, pos, blockType)=>{
+      const fallingBlockEntity = new FallingBlockEntity(gl, this.world, pos, blockType);
+
+      fallingBlockEntity.messages.once('spawnBlock', (_, [x, y, z], blockType) => {
+        this.world.setBlock(x, y, z, BlocksManager.create(blockType));
+      });
+
+      this.entities.push(fallingBlockEntity);
+    });
 
     this.raycaster = new Raycaster(this.world);
 
@@ -243,6 +256,11 @@ export default class Minecraft extends DisplayObject {
       }
     }
 
+
+    for (let i = 0; i < this.entities.length; i++) {
+      this.entities[i].render(camera);
+    }
+
     // this.blockk.render(camera);
     // this.playerMesh.render(camera);
 
@@ -255,17 +273,28 @@ export default class Minecraft extends DisplayObject {
   }
 
   update(dt) {
-    if(  (Date.now()-this._startTime)/1000 <300 ){
+    if ((Date.now() - this._startTime) / 1000 < 300) {
       this.world.onUpdate();
     }
+
     if (this.loadingMesh.visible)
       return;
 
     this.player.onUpdate(dt);
 
-    this.skyMesh.x = this.player.x;
-    this.skyMesh.y = this.player.y;
-    this.skyMesh.z = this.player.z;
+    this.skyMesh.position = this.player.position;
+
+    const entities = [];
+
+    for (let i = 0; i < this.entities.length; i++) {
+      this.entities[i].onUpdate(dt);
+
+      if (!this.entities[i].isDestroyed) {
+        entities.push(this.entities[i]);
+      }
+    }
+
+    this.entities = entities;
 
     this._updateSelectedBlock();
 

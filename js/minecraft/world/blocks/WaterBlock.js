@@ -18,7 +18,7 @@ export default class WaterBlock extends BaseBlock {
     super(BLOCK_TYPE.WATER);
 
     this._liquidLevel = MAX_LIQUID_LEVEL;
-    this._needsUpdate = true;
+    this.needsUpdate = true;
     this._isSource = true;
     this._isFall = false;
     this._resetTime();
@@ -55,7 +55,7 @@ export default class WaterBlock extends BaseBlock {
         world.setBlock(pos.x, pos.y, pos.z, this);
       }
     } else {
-      this._needsUpdate = false;
+      this.needsUpdate = false;
     }
 
     this._resetTime();

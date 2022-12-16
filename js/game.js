@@ -35,9 +35,8 @@ import woodSong4 from 'assets/audio/wood4.ogg';
 
 import CustomAssetManager from './custom-asset-manager';
 
-// import { Scene3D } from './scene3d';
-// import { Start } from './rebuild/start';
 import Minecraft from './minecraft/minecraft';
+
 // import { LevelGenTest } from './tests/level-gen-test/level-gen-test';
 // import { LightTest } from './tests/light-test';
 // import { LightTestNew } from './tests/light-test-new';

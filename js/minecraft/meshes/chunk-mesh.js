@@ -128,18 +128,18 @@ export default class ChunkMesh extends Mesh {
     gl.enableVertexAttribArray(blockIndexAttribLocation);
   }
 
-  static _initTexture() {
+  static _initTexture(gl_context = gl) {
+    const gl = gl_context;
+
     if (Black.assets.getGLTexture('texture01')) {
       texture = Black.assets.getGLTexture('texture01');
     }
 
     if (texture !== null) {
-      return;
+      return texture;
     }
 
     const image = Black.assets.getTexture('main').native;
-
-    gl.useProgram(program);
 
     texture = gl.createTexture();
 
@@ -154,6 +154,8 @@ export default class ChunkMesh extends Mesh {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.generateMipmap(gl.TEXTURE_2D);
     gl.bindTexture(gl.TEXTURE_2D, null);
+
+    return texture;
   }
 }
 

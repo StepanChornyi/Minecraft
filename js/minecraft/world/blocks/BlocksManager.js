@@ -6,6 +6,7 @@ import DirtBlock from "./DirtBlock";
 import GrassBlock from "./GrassBlock";
 import GrassPlantBlock from "./GrassPlantBlock";
 import RosePlantBlock from "./RosePlantBlock";
+import SandBlock from "./SandBlock";
 import StoneBrickBlock from "./StoneBrickBlock";
 import WaterBlock from "./WaterBlock";
 
@@ -25,7 +26,7 @@ BLOCK_CLASSES[BLOCK_TYPE.TORCH] = BaseBlock;
 BLOCK_CLASSES[BLOCK_TYPE.LEAVES] = BaseBlock;
 BLOCK_CLASSES[BLOCK_TYPE.GRASS] = GrassPlantBlock;
 BLOCK_CLASSES[BLOCK_TYPE.ROSE] = RosePlantBlock;
-BLOCK_CLASSES[BLOCK_TYPE.SAND] = BaseBlock;
+BLOCK_CLASSES[BLOCK_TYPE.SAND] = SandBlock;
 BLOCK_CLASSES[BLOCK_TYPE.SANDSTONE] = BaseBlock;
 BLOCK_CLASSES[BLOCK_TYPE.DEAD_BUSH] = DeadBushBlock;
 BLOCK_CLASSES[BLOCK_TYPE.CACTUS] = CactusBlock;

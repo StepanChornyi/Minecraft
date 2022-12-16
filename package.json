@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "perlin-simplex": "0.0.3",
-    "primitive-sphere": "3.0.0"
+    "primitive-sphere": "3.0.0",
+    "raw-loader": "^4.0.2"
   }
 }

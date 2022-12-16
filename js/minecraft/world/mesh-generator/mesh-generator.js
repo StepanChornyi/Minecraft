@@ -29,7 +29,7 @@ export default class MeshGenerator {
   }
 
   textureCoord(axis, offset) {
-    return blockSideUVOffset + (blockSideUVSize + blockSideUVOffset * 2) * axis + offset * (blockSideUVSize) + (offset ? -pixelOffset : pixelOffset);
+    return MeshGenerator.textureCoord(axis, offset);
   }
 
   getBv(blocks, vec3) {
@@ -103,6 +103,10 @@ export default class MeshGenerator {
 
   static get floatsPerVertice() {
     return floatsPerVertice;
+  }
+
+  static textureCoord(axis, offset) {
+    return blockSideUVOffset + (blockSideUVSize + blockSideUVOffset * 2) * axis + offset * (blockSideUVSize) + (offset ? -pixelOffset : pixelOffset);
   }
 }
 

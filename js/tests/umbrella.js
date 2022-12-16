@@ -24,7 +24,7 @@ export class Umbrella extends DisplayObject {
   init() {
     const view = this.view;
 
-    const innerRadius = 20;
+    const innerRadius = 15;
     const outerRadius = 270;
     const segmentsCount = 8;
     const segmentCPOffset = 70;
