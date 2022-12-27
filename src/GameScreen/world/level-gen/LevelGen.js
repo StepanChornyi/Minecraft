@@ -3,7 +3,7 @@ import ChunkStorage from "../chunk-storage";
 import CONFIG from "../config";
 import WorldGenerator from "./world-generator";
 import LevelGenChunk from "./LevelGenChunk";
-import { LevelGenTest } from "./level-gen-test";
+import BiomeGen from "./biome-gen";
 
 const CHUNK_SIZE = CONFIG.CHUNK_SIZE;
 const CHUNK_HEIGHT = CONFIG.CHUNK_HEIGHT;
@@ -32,7 +32,7 @@ export default class LevelGen {
     for (let x = 0; x < CHUNK_SIZE; x++) {
       for (let z = 0; z < CHUNK_SIZE; z++) {
         chunkGen.setHeightMap(x, z, this._worldGen.getHeightNoise(x + chunkX * CHUNK_SIZE, z + chunkZ * CHUNK_SIZE));
-        chunkGen.setBiome(x, z, LevelGenTest.getBiome(x + chunkX * CHUNK_SIZE, z + chunkZ * CHUNK_SIZE));
+        chunkGen.setBiome(x, z, BiomeGen.getBiome(x + chunkX * CHUNK_SIZE, z + chunkZ * CHUNK_SIZE));
       }
     }
 

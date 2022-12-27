@@ -1,17 +1,17 @@
-import { BIOME_WETHER_FACTOR, BLOCK_TYPES_TEST } from "./block-types-test";
+import { BIOME_WETHER_FACTOR, BIOME_TYPES } from "./biome-types";
 import NoiseGen from "./noise-gen";
 
 const BIOMES = [
-  BLOCK_TYPES_TEST.FOREST,
-  BLOCK_TYPES_TEST.DESERT,
+  BIOME_TYPES.FOREST,
+  BIOME_TYPES.DESERT,
 ];
 
 const BIOME_NOISE = {};
 
-BIOME_NOISE[BLOCK_TYPES_TEST.FOREST] = new NoiseGen();
-BIOME_NOISE[BLOCK_TYPES_TEST.DESERT] = new NoiseGen();
+BIOME_NOISE[BIOME_TYPES.FOREST] = new NoiseGen();
+BIOME_NOISE[BIOME_TYPES.DESERT] = new NoiseGen();
 
-export class LevelGenTest {
+export default class BiomeGen {
   static getBiome(x, y) {
     const noises = [];
 
