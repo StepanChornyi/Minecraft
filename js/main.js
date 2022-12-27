@@ -1,6 +1,6 @@
 import { CanvasDriver, Input, Engine, StageScaleMode, Black, MasterAudio } from "black-engine";
 //import { GameSpine } from "./game-spine";
-import { Game } from "./game";
+import { Game } from "./Game";
 // import * as glMatrix from "./gl-matrix";
 
 document.addEventListener('contextmenu', e => e.preventDefault());
@@ -14,14 +14,5 @@ engine.viewport.isTransparent = true;
 engine.viewport.backgroundColor = 0x222222;
 engine.start();
 engine.stage.setSize(900, 500);
-engine.stage.scaleMode = StageScaleMode.LETTERBOX;
-
-// Wroom, wroom!
-engine.start();
-
-// Set default stage size
-engine.stage.setSize(900, 500);
-
-// Makes stage always centered
 engine.stage.scaleMode = StageScaleMode.LETTERBOX;
 

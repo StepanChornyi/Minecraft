@@ -1,4 +1,4 @@
-import Object3D from "../minecraft/object3D";
+import Object3D from "../GameScreen/object3D";
 
 export default class Ray extends Object3D {
   constructor() {

@@ -30,7 +30,7 @@ gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-export default class Minecraft extends DisplayObject {
+export default class GameScreen extends DisplayObject {
   constructor() {
     super();
 

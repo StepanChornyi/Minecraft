@@ -16,7 +16,7 @@ module.exports = {
     mainFields: ['main']
   },
   entry: {
-    code: './js/main.js',
+    code: './js/Main.js',
   },
   output: {
     path: `${__dirname}/dist`,
