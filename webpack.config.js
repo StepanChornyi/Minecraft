@@ -11,12 +11,12 @@ module.exports = {
     alias: {
       assets: `${__dirname}/assets/`,
       shaders: `${__dirname}/shaders/`,
-      js: `${__dirname}/js/`
+      js: `${__dirname}/src/`
     },
     mainFields: ['main']
   },
   entry: {
-    code: './js/Main.js',
+    code: './src/Main.js',
   },
   output: {
     path: `${__dirname}/dist`,
