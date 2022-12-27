@@ -3,28 +3,42 @@ import { LoaderType, AssetManager, GameObject, AssetType, Asset, Debug } from 'b
 import { Preloader } from './preloader';
 
 import GameScreen from './GameScreen/GameScreen';
+import LoadingScreen from './LoadingScreen/LoadingScreen';
 
 export class Game extends GameObject {
   constructor() {
     super();
 
-    // Pick default AssetManager
     const preloader = this.addChild(new Preloader());
 
+    preloader.loadPreloader();
 
-    preloader.on('complete', this.onAssetsLoadded, this);
+    preloader.once('complete', () => {
+      this._loadingScreen = this.addChild(new LoadingScreen());
 
-    preloader.load();
+      preloader.load();
+      preloader.once('complete', this.onAssetsLoadded, this);
+    });
   }
 
   onAssetsLoadded() {
     this.touchable = true;
 
-    this.add(new GameScreen());
+    const loadingScreen = this._loadingScreen;
+    const gameScreen = new GameScreen();
 
-    // this.add(new LevelGenTest());
+    gameScreen.on("initProgress", (_, val) => {
+      loadingScreen.setProgress(val);
+    })
 
+    gameScreen.on("initCompleted", () => {
+      loadingScreen.visible = false;
+      gameScreen.visible = true;
+    })
 
+    gameScreen.visible = false;
+
+    this.addChildAt(gameScreen, 0);
   }
 }
 

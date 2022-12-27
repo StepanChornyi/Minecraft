@@ -1,6 +1,6 @@
 let gl = null;
 
-export default class Mesh {
+export default class BaseMesh {
   constructor(gl_context, program, config) {
     gl = gl_context;
 

@@ -1,5 +1,5 @@
 import { Black } from 'black-engine';
-import Mesh from '../../../libs/Mesh';
+import BaseMesh from '../../../libs/BaseMesh';
 import WEBGL_UTILS from '../../../utils/webgl-utils';
 
 import vs from './cursor.vs.glsl';
@@ -21,7 +21,7 @@ const meshConfig = {
   }
 };
 
-export default class Cursor extends Mesh {
+export default class Cursor extends BaseMesh {
   constructor(gl_context) {
     gl = gl_context;
     program = program || WEBGL_UTILS.createProgram(gl, vs, fs);

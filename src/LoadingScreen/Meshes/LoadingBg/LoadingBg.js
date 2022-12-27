@@ -1,6 +1,6 @@
 import { Black } from 'black-engine';
 import WEBGL_UTILLS from '../../../utils/webgl-utils';
-import Mesh from '../../../libs/Mesh';
+import BaseMesh from '../../../libs/BaseMesh';
 import vs from  './loading-bg.vs.glsl';
 import fs from  './loading-bg.fs.glsl';
 
@@ -27,7 +27,7 @@ const meshConfig = {
   }
 };
 
-export default class LoadingBg extends Mesh {
+export default class LoadingBg extends BaseMesh {
   constructor(gl_context) {
     gl = gl_context;
     program = program || WEBGL_UTILLS.createProgram(gl, vs, fs);

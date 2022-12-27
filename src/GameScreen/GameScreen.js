@@ -5,8 +5,6 @@ import Cursor from './meshes/Cursor/Cursor';
 import WEBGL_UTILS from '../utils/webgl-utils';
 import World from './world/world';
 import Player from './player';
-import LoadingMesh from './meshes/loading-mesh';
-import LoadingBg from './meshes/LoadingBg/LoadingBg';
 import TileRaycaster3D from '../Utils3D/TileRaycaster3D';
 import ResizeActionComponent from '../libs/resize-action-component';
 import Vector3 from '../Utils3D/vector3';
@@ -46,8 +44,6 @@ export default class GameScreen extends DisplayObject {
     this.cursor = new Cursor(gl);
     this.world = new World(gl, this.camera);
     this.player = new Player(this.world, this.camera);
-    this.loadingBg = new LoadingBg(gl);
-    this.loadingMesh = new LoadingMesh(gl);
     this.playerMesh = new PlayerMesh(gl);
     this.selectedBlock = new SelectedBlockMesh(gl);
     this.skyMesh = new SkyMesh(gl);
@@ -73,8 +69,6 @@ export default class GameScreen extends DisplayObject {
     });
 
     this.ui = this.addChild(new Ui());
-
-    this.ui.visible = false;
 
     this.isPaused = false;
 
@@ -104,31 +98,16 @@ export default class GameScreen extends DisplayObject {
   }
 
   init() {
-    this.loadingMesh.visible = true;
-    this.loadingMesh.setProgress(0);
-    this.loadingMesh.render(this.camera);
+    this._initCompleted = false;
 
     this.world.on('initProgress', (_, val) => {
-      document.getElementById("loadingBar").style.width = `${Math.min(1, val * 1.05) * 100}%`;
-      document.getElementById("loading").style.display = "none"
-
-      this.loadingMesh.setProgress(Math.min(1, val * 1.05));
+      this.post('initProgress', Math.min(1, val * 1.05));
     });
 
     this.world.on('initCompleted', () => {
-      document.getElementById("loading").style.display = "none"
-      this.loadingMesh.visible = false;
-      this.ui.visible = true;
+      this._initCompleted = true;
 
-      // setTimeout(() => {
-      //   const torchX = 2;
-      //   const torchZ = 2;
-      //   const torchY = this.world.getGroundY(torchX, torchZ) + 1;
-
-      //   if (!this.world.getBlock(torchX, torchY, torchZ)) {
-      //     this.world.setBlock(torchX, torchY, torchZ, BLOCK_TYPE.TORCH);
-      //   }
-      // }, 50);
+      this.post('initCompleted');
     });
 
     const player = this.player;
@@ -213,6 +192,9 @@ export default class GameScreen extends DisplayObject {
   }
 
   onRender() {
+    if (!this.visible)
+      return;
+
     const world = this.world;
     const camera = this.camera;
 
@@ -222,12 +204,6 @@ export default class GameScreen extends DisplayObject {
     gl.colorMask(false, false, false, false);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.colorMask(true, true, true, false);
-
-    if (this.loadingMesh.visible) {
-      this.loadingBg.render(camera);
-      this.loadingMesh.render(camera);
-      return;
-    }
 
     this.skyMesh.render(camera);
 
@@ -281,7 +257,7 @@ export default class GameScreen extends DisplayObject {
       this.world.onUpdate();
     }
 
-    if (this.loadingMesh.visible)
+    if (!this._initCompleted)
       return;
 
     this.player.onUpdate(dt);
