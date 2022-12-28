@@ -1,11 +1,21 @@
-import { LoaderType, AssetManager, GameObject, AssetType, Asset, Debug } from 'black-engine';
+import { LoaderType, AssetManager, GameObject, AssetType, Asset, Debug, DisplayObject } from 'black-engine';
 
 import { Preloader } from './preloader';
 
 import GameScreen from './GameScreen/GameScreen';
 import LoadingScreen from './LoadingScreen/LoadingScreen';
+import WEBGL_UTILS from './utils/webgl-utils';
 
-export class Game extends GameObject {
+const canvas = document.getElementById("canvas3D");
+const gl = WEBGL_UTILS.getWebGlContext(canvas);
+
+gl.clearColor(0.3, 0.3, 0.3, 1);
+gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+export class Game extends DisplayObject {
   constructor() {
     super();
 
@@ -39,6 +49,26 @@ export class Game extends GameObject {
     gameScreen.visible = false;
 
     this.addChildAt(gameScreen, 0);
+  }
+
+  onRender() {
+    gl.colorMask(false, false, false, false);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.colorMask(true, true, true, false);
+
+    this._renderGL(this);
+  }
+
+  _renderGL(gameObject) {
+    for (let i = 0; i < gameObject.mChildren.length; i++) {
+      const child = gameObject.mChildren[i];
+
+      if (child.visible) {
+        child.renderGL && child.renderGL();
+
+        this._renderGL(child);
+      }
+    }
   }
 }
 

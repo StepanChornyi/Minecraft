@@ -30,6 +30,7 @@ import woodSong1 from 'assets/audio/wood1.ogg';
 import woodSong2 from 'assets/audio/wood2.ogg';
 import woodSong3 from 'assets/audio/wood3.ogg';
 import woodSong4 from 'assets/audio/wood4.ogg';
+import item from 'assets/audio/item.mp3';
 
 import CustomAssetManager from './libs/custom-asset-manager';
 
@@ -129,6 +130,7 @@ export class Preloader extends DisplayObject {
     assets.enqueueSound("woodSong2", woodSong2);
     assets.enqueueSound("woodSong3", woodSong3);
     assets.enqueueSound("woodSong4", woodSong4);
+    assets.enqueueSound("item", item);
   }
 }
 

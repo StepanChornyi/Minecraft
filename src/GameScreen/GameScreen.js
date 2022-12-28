@@ -17,7 +17,8 @@ import SkyMesh from './meshes/sky-mesh';
 import ParticlesMesh from './meshes/particles-mesh';
 import BlocksManager from './world/blocks/BlocksManager';
 import CONFIG from './world/config';
-import FallingBlockEntity from './entities/FallingBlockEntity';
+import FallingBlockEntity from './entities/FallingBlockEntity/FallingBlockEntity';
+import Drop from './entities/Drop/Drop';
 
 const canvas = document.getElementById("canvas3D");
 const gl = WEBGL_UTILS.getWebGlContext(canvas);
@@ -138,6 +139,19 @@ export default class GameScreen extends DisplayObject {
 
       this.world.destroy(intersection[0], intersection[1], intersection[2]);
 
+      const drop = new Drop(gl, this.world, block.type, player);
+
+      drop.body.x = intersection[0] + 0.5;
+      drop.body.y = intersection[1] + 0.5;
+      drop.body.z = intersection[2] + 0.5;
+
+      this.entities.push(drop);
+
+      drop.once("collected", () => {
+        Black.audio.play("item", "master", 0.4);
+
+      });
+
       if (BLOCK_SOUND[block.type]) {
         const dx = intersection[0] - player.x;
         const dy = intersection[1] - player.y;
@@ -191,19 +205,12 @@ export default class GameScreen extends DisplayObject {
     this.addComponent(new ResizeActionComponent(this.onResize, this));
   }
 
-  onRender() {
-    if (!this.visible)
-      return;
-
+  renderGL() {
     const world = this.world;
     const camera = this.camera;
 
     this._frameTime = performance.now() - this._lastFrameTime;
     this._lastFrameTime = performance.now();
-
-    gl.colorMask(false, false, false, false);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.colorMask(true, true, true, false);
 
     this.skyMesh.render(camera);
 

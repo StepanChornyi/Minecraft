@@ -22,12 +22,8 @@ export default class LoadingScreen extends DisplayObject {
     this._loadingBar.setProgress(val);
   }
 
-  onRender() {
+  renderGL() {
     const camera = this.camera;
-
-    gl.colorMask(false, false, false, false);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl.colorMask(true, true, true, false);
 
     if (this.visible) {
       this._loadingBg.render(camera);

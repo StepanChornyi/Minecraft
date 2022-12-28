@@ -25,4 +25,16 @@ export default class MathUtils {
   static abs(v) {
     return v < 0 ? -v : v;
   }
+
+  static lerp(a, b, t) {
+    return a + (b - a) * t;
+  }
+
+  static rndBtw(a, b) {
+    return MathUtils.lerp(a, b, Math.random());
+  }
+
+  static rndSign() {
+    return Math.random() < 0.5 ? -1 : 1;
+  }
 }

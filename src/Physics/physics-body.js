@@ -19,21 +19,26 @@ export default class PhysicsBody extends Object3D {
     this.dampingStand = new Vector3(0.85, 0.99, 0.85);
     this.dampingFall = new Vector3(0.83, 0.99, 0.83);
 
+    this.gravity = GRAVITY;
+
     this.isCollideBottom = false;
+    this.checkCollision = true;
+    this.enableDamping = true;
   }
 
   onUpdate(dt) {
-    this.acceleration.y = GRAVITY;
+    this.acceleration.y = this.gravity;
 
     this.acceleration.clone()
       .multiplyScalar(dt)
       .addTo(this.velocity);
 
-    this._checkCollision();
+    if (this.checkCollision)
+      this._checkCollision();
 
     this.velocity.addTo(this);
 
-    if (this.isCollideBottom) {
+    if (this.isCollideBottom && this.enableDamping ) {
       if (this.acceleration.x || this.acceleration.z) {
         this.velocity.multiply(this.dampingWalk);
       } else {

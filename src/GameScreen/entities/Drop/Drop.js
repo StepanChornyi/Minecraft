@@ -1,19 +1,21 @@
-import Vector3 from '../../Utils3D/vector3';
-import WEBGL_UTILS from '../../utils/webgl-utils';
-import { BLOCK_TYPE } from '../block-type';
-import ChunkMesh from '../meshes/chunk-mesh';
-import Mesh from '../meshes/mesh';
-import PhysicsBody from '../../Physics/physics-body';
-import CONFIG from '../world/config';
-import BlockMeshGenerator from '../world/mesh-generator/block-mesh-generator';
-import LightEngine from '../world/mesh-generator/LightEngine';
-import MeshGenerator from '../world/mesh-generator/mesh-generator';
-import Object3D from '../../Utils3D/Object3D';
+import { Black, MessageDispatcher } from 'black-engine';
 
-import vs from './block_shader.vs.glsl';
-import fs from './block_shader.fs.glsl';
-import MESH_TEXTURES from '../world/mesh-generator/mesh-textures';
-import { MessageDispatcher } from 'black-engine';
+import Vector3 from '../../../Utils3D/vector3';
+import WEBGL_UTILS from '../../../utils/webgl-utils';
+import { BLOCK_TYPE } from '../../block-type';
+import ChunkMesh from '../../meshes/chunk-mesh';
+import Mesh from '../../meshes/mesh';
+import PhysicsBody from '../../../Physics/physics-body';
+import CONFIG from '../../world/config';
+import BlockMeshGenerator from '../../world/mesh-generator/block-mesh-generator';
+import LightEngine from '../../world/mesh-generator/LightEngine';
+import MeshGenerator from '../../world/mesh-generator/mesh-generator';
+
+import MESH_TEXTURES from '../../world/mesh-generator/mesh-textures';
+
+import vs from './drop.vs.glsl';
+import fs from './drop.fs.glsl';
+import MathUtils from '../../../utils/MathUtils';
 
 let gl = null;
 let program = null;
@@ -23,15 +25,15 @@ let texCoordAttribLocation;
 let faceLightAttribLocation;
 let blockIndexAttribLocation;
 
-let hightLightIndexUniformLocation;
+let lightUniformLocation;
 let matWorldUniformLocation;
 let matViewUniformLocation;
 let matProjUniformLocation;
 
-const size = new Vector3(0.5, 1, 0.5);
+const size = new Vector3(0.3, 0.5, 0.3);
 
-export default class FallingBlockEntity extends Mesh {
-  constructor(_gl, world, [x, y, z] = [0, 0, 0], blockType = BLOCK_TYPE.SAND) {
+export default class Drop extends Mesh {
+  constructor(_gl, world, blockType = BLOCK_TYPE.SAND, player) {
     gl = _gl;
 
     if (!program) {
@@ -42,7 +44,7 @@ export default class FallingBlockEntity extends Mesh {
       faceLightAttribLocation = gl.getAttribLocation(program, 'faceLight');
       blockIndexAttribLocation = gl.getAttribLocation(program, 'blockIndex');
 
-      hightLightIndexUniformLocation = gl.getUniformLocation(program, 'hightLightIndex');
+      lightUniformLocation = gl.getUniformLocation(program, 'hightLightIndex');
       matWorldUniformLocation = gl.getUniformLocation(program, 'mWorld');
       matViewUniformLocation = gl.getUniformLocation(program, 'mView');
       matProjUniformLocation = gl.getUniformLocation(program, 'mProj');
@@ -51,14 +53,23 @@ export default class FallingBlockEntity extends Mesh {
     super(gl, program);
 
     this.world = world;
+    this.player = player;
     this.body = new PhysicsBody(world, size);
     this.texture = ChunkMesh._initTexture(gl);
     this.messages = new MessageDispatcher();
     this.blockType = blockType;
 
-    this.body.position = this.position = [x + 0.5, y + 0.5, z + 0.5];
+    this.body.velocity.x = MathUtils.rndBtw(0, 0.05) * MathUtils.rndSign();
+    this.body.velocity.y = MathUtils.rndBtw(0.05, 0.07);
+    this.body.velocity.z = MathUtils.rndBtw(0, 0.05) * MathUtils.rndSign();
+    this.body.gravity *= 0.6;
+
+    this._time = Math.random();
+    this._light = 0;
+    this._collectVelocity = 0;
 
     this.isDestroyed = false;
+    this.snapped = false;
 
     this._init();
   }
@@ -69,16 +80,44 @@ export default class FallingBlockEntity extends Mesh {
 
     this.body.onUpdate(dt);
 
+    this._time += dt;
+
     this.position = this.body.position;
+    this.y += (Math.sin(this._time * 0.02) + 1) * 0.05
+    this.rotationY = this._time * 0.02;
 
-    if (this.body.isCollideBottom) {
-      this.messages.post("spawnBlock", [
-        Math.floor(this.x),
-        Math.floor(this.y),
-        Math.floor(this.z),
-      ], this.blockType);
+    const block = this.world.getBlock(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z));
+    this._light = block ? 0.1 + (LightEngine.getLight(block.light) / CONFIG.MAX_LIGHT) * 0.9 : 1;
 
-      this.isDestroyed = true;
+    const dist = 1.2;
+    const collectDist = 0.1;
+
+    if (!this.snapped) {
+      if (Math.abs(this.player.x - this.x) < dist && Math.abs(this.player.y - this.y) < dist && Math.abs(this.player.z - this.z) < dist) {
+        if (glMatrix.vec3.dist(this.position, this.player.position) < dist) {
+          this.snapped = true;
+        }
+      }
+    }
+
+    if (this.snapped) {
+      this.body.checkCollision = false;
+      this.body.enableDamping = false;
+      this.body.gravity = 0;
+
+      this.body.x = MathUtils.lerp(this.body.x, this.player.x, this._collectVelocity);
+      this.body.y = MathUtils.lerp(this.body.y, this.player.y, this._collectVelocity);
+      this.body.z = MathUtils.lerp(this.body.z, this.player.z, this._collectVelocity);
+
+      this.position = this.body.position;
+
+      this._collectVelocity += 0.05;
+
+      if (Math.abs(this.player.x - this.x) < collectDist && Math.abs(this.player.y - this.y) < collectDist && Math.abs(this.player.z - this.z) < collectDist) {
+        this.isDestroyed = true;
+
+        this.post('collected');
+      }
     }
   }
 
@@ -95,11 +134,11 @@ export default class FallingBlockEntity extends Mesh {
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
     gl.activeTexture(gl.TEXTURE0);
 
-    gl.uniform1f(hightLightIndexUniformLocation, -1);
-
     this.updateAttribPointers();
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
+
+    gl.uniform1f(lightUniformLocation, this._light);
 
     gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, camera.projectionMatrix);
     gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, camera.viewMatrix);
@@ -164,6 +203,7 @@ export default class FallingBlockEntity extends Mesh {
 
     const block = this.world.getBlock(Math.floor(this.x), Math.floor(this.y - 1), Math.floor(this.z));
     const light = block ? 0.1 + (LightEngine.getLight(block.light) / CONFIG.MAX_LIGHT) * 0.9 : 1;
+    const scale = 0.25;
 
     this.vertices.splice(0);
     this.indices.splice(0);
@@ -188,13 +228,13 @@ export default class FallingBlockEntity extends Mesh {
 
         this.vertices[i + 6] = 0;
 
-        this.vertices[i + 5] = light * data.light;
+        this.vertices[i + 5] = data.light;
 
         // mesh.vertices[i + 5] = Math.max(0, Math.min(1, mesh.vertices[i + 5]));
 
-        this.vertices[i] = (this.vertices[i]) * 0.5;
-        this.vertices[i + 1] = (this.vertices[i + 1]) * 0.5;
-        this.vertices[i + 2] = (this.vertices[i + 2]) * 0.5;
+        this.vertices[i] = (this.vertices[i]) * 0.5 * scale;
+        this.vertices[i + 1] = (this.vertices[i + 1]) * 0.5 * scale;
+        this.vertices[i + 2] = (this.vertices[i + 2]) * 0.5 * scale;
       }
 
       for (let i = 0; i < data.triangles.default.length; i++) {
