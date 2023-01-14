@@ -89,12 +89,12 @@ export default class Drop extends Mesh {
     const block = this.world.getBlock(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z));
     this._light = block ? 0.1 + (LightEngine.getLight(block.light) / CONFIG.MAX_LIGHT) * 0.9 : 1;
 
-    const dist = 1.2;
+    const snapDist = 1.3;
     const collectDist = 0.1;
 
     if (!this.snapped) {
-      if (Math.abs(this.player.x - this.x) < dist && Math.abs(this.player.y - this.y) < dist && Math.abs(this.player.z - this.z) < dist) {
-        if (glMatrix.vec3.dist(this.position, this.player.position) < dist) {
+      if (Math.abs(this.player.x - this.x) < snapDist && Math.abs(this.player.y - this.y) < snapDist && Math.abs(this.player.z - this.z) < snapDist) {
+        if (glMatrix.vec3.dist(this.position, this.player.position) < snapDist) {
           this.snapped = true;
         }
       }
