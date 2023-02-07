@@ -108,7 +108,6 @@ export class Preloader extends DisplayObject {
     assets.enqueueImage('iconsSheet', iconsSheet);
     assets.enqueueImage('testTex', testTex);
     assets.enqueueImage('transparentTexture', transparentTexture);
-    assets.enqueueImage('test', test);
   }
 
   _enqueueSounds() {
