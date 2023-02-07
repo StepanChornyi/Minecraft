@@ -1,6 +1,6 @@
 class WebglUtils {
   getWebGlContext(canvas) {
-    const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl") || canvas.getContext("webgl2");
+    const gl = canvas.getContext("webgl2") || canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
 
     if (!gl) {
       console.warn('webgl not supported');

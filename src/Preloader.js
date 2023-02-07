@@ -9,8 +9,8 @@ import sunTexture from 'assets/textures/sun.png';
 import testTex from 'assets/textures/tex_test.png';
 import transparentTexture from 'assets/textures/transparent.png';
 
-import chunkVsGLSL from 'shaders/chunk/chunk.vs.glsl';
-import chunkFsGLSL from 'shaders/chunk/chunk.fs.glsl';
+// import chunkVsGLSL from 'shaders/chunk/chunk.vs.glsl';
+// import chunkFsGLSL from 'shaders/chunk/chunk.fs.glsl';
 import chunkTransparentFsGLSL from 'shaders/chunk/chunk_transparent.fs.glsl';
 import chunkTransparentVsGLSL from 'shaders/chunk/chunk_transparent.vs.glsl';
 
@@ -90,8 +90,8 @@ export class Preloader extends DisplayObject {
     this._enqueueImages();
     this._enqueueSounds();
 
-    assets.enqueueXHR('chunk-vs', chunkVsGLSL);
-    assets.enqueueXHR('chunk-fs', chunkFsGLSL);
+    // assets.enqueueXHR('chunk-vs', chunkVsGLSL);
+    // assets.enqueueXHR('chunk-fs', chunkFsGLSL);
     assets.enqueueXHR('chunk-transparent-fs', chunkTransparentFsGLSL);
     assets.enqueueXHR('chunk-transparent-vs', chunkTransparentVsGLSL);
 
@@ -108,7 +108,7 @@ export class Preloader extends DisplayObject {
     assets.enqueueImage('iconsSheet', iconsSheet);
     assets.enqueueImage('testTex', testTex);
     assets.enqueueImage('transparentTexture', transparentTexture);
-
+    assets.enqueueImage('test', test);
   }
 
   _enqueueSounds() {

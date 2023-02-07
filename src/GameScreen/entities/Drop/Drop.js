@@ -3,7 +3,7 @@ import { Black, MessageDispatcher } from 'black-engine';
 import Vector3 from '../../../Utils3D/vector3';
 import WEBGL_UTILS from '../../../utils/webgl-utils';
 import { BLOCK_TYPE } from '../../block-type';
-import ChunkMesh from '../../meshes/chunk-mesh';
+import ChunkMesh from '../../meshes/Chunk/chunk-mesh';
 import Mesh from '../../meshes/mesh';
 import PhysicsBody from '../../../Physics/physics-body';
 import CONFIG from '../../world/config';

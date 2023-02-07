@@ -1,4 +1,4 @@
-import ChunkMesh from '../../meshes/chunk-mesh';
+import ChunkMesh from '../../meshes/Chunk/chunk-mesh';
 import { BLOCK_TYPE } from '../../block-type';
 import Vector3 from '../../../Utils3D/vector3';
 import LightEngine from '../mesh-generator/LightEngine';

@@ -1,9 +1,16 @@
 import { Black } from 'black-engine';
-import Mesh from './mesh';
-import WEBGL_UTILS from '../../utils/webgl-utils';
+import Mesh from '../mesh';
+import WEBGL_UTILS from '../../../utils/webgl-utils';
+
+import vs from './chunk.vs.glsl';
+import fs from './chunk.fs.glsl';
+
+import vsShadowMap from './chunk-shadow-map.vs.glsl';
+import fsShadowMap from './chunk-shadow-map.fs.glsl';
 
 let gl = null;
 let program = null;
+let programShadow = null;
 let texture = null;
 
 let positionAttribLocation;
@@ -21,7 +28,10 @@ export default class ChunkMesh extends Mesh {
     gl = gl_context;
 
     if (!program) {
-      program = WEBGL_UTILS.createProgram(gl, Black.assets.getXHRAsset('chunk-vs'), Black.assets.getXHRAsset('chunk-fs'));
+      program = WEBGL_UTILS.createProgram(gl, vs, fs);
+      programShadow = WEBGL_UTILS.createProgram(gl, vsShadowMap, fsShadowMap);
+
+      // program = programShadow;
 
       positionAttribLocation = gl.getAttribLocation(program, 'vertPosition');
       texCoordAttribLocation = gl.getAttribLocation(program, 'vertTexCoord');
@@ -79,6 +89,12 @@ export default class ChunkMesh extends Mesh {
     gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, this.transformMatrix);
 
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
+  }
+
+  renderShadow(camera, blockIndex) {
+    this.program = programShadow;
+    this.render(camera, blockIndex);
+    this.program = program;
   }
 
   updateAttribPointers() {
