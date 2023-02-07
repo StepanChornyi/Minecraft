@@ -4,6 +4,9 @@ import { BLOCK_TYPE } from '../block-type';
 import HELPERS from '../../utils/helpers';
 import DebugLog from './debug-log';
 import InventoryBar from './inventory-bar';
+import Inventory from './Inventory';
+import Overlay from './Overlay';
+import InventoryModel from './InventoryModel';
 
 export default class Ui extends DisplayObject {
   constructor() {
@@ -14,17 +17,10 @@ export default class Ui extends DisplayObject {
     this._inventoryBar = null;
 
     this._activeItemPos = 0;
-    this._items = [
-      BLOCK_TYPE.GRASS_BLOCK,
-      BLOCK_TYPE.DIRT,
-      BLOCK_TYPE.STONE,
-      BLOCK_TYPE.IRON,
-      BLOCK_TYPE.LEAVES,
-      BLOCK_TYPE.WOOD,
-      BLOCK_TYPE.TORCH,
-      BLOCK_TYPE.WATER,
-      BLOCK_TYPE.STONE_BRICK,
-    ];
+
+    this._inventoryModel = new InventoryModel();
+
+    this._inventoryModel.addItem(BLOCK_TYPE.TORCH);
 
     this._init();
   }
@@ -34,17 +30,64 @@ export default class Ui extends DisplayObject {
   }
 
   getActiveBlockType() {
-    return this._items[this._activeItemPos];
+    return this._inventoryModel.items[this._activeItemPos].type;
+  }
+
+  collectItem(blockType) {
+    this._inventoryModel.addItem(blockType);
   }
 
   _init() {
     const inventoryBar = this._inventoryBar = new InventoryBar();
     const debugLog = this._debugLog = new DebugLog();
+    const overlay = this._overlay = new Overlay(0);
+    const inventoryOverlay = this._inventoryOverlay = new Overlay(0.6);
+    const inventory = this._inventory = new Inventory(this._inventoryModel);
+    const inventoryContainer = this._inventoryContainer = new DisplayObject();
 
-    inventoryBar.setItems(this._items);
+    inventoryContainer.touchable = true;
+    inventoryContainer.add(inventoryOverlay, inventory);
+    // inventoryContainer.visible = false;
+
+    overlay.touchable = true;
+    overlay.on('pointerDown', () => {
+      // HELPERS.requestPointerLock(document.body)
+      this.switchInventory();
+    });
+
+    // inventoryOverlay.touchable = true;
+    // inventoryOverlay.on('pointerDown', ()=>{
+    //   HELPERS.requestPointerLock(document.body)
+    // });
+
+    document.onkeydown = (e) => {
+      if (e.keyCode === 69)
+        this.switchInventory();
+
+      // if (e.keyCode === 27)
+      //   this.switchInventory(true);
+
+      // e.preventDefault();
+    }
+
+    inventoryBar.setItems(this._inventoryModel.items);
     inventoryBar.setSliderPosition(this._activeItemPos);
 
-    this.add(inventoryBar, debugLog);
+    this._inventoryModel.on('change', () => {
+      inventoryBar.setItems(this._inventoryModel.items);
+    });
+
+    this.add(overlay, inventoryBar, debugLog, inventoryContainer);
+  }
+
+  switchInventory(exitOnly = false) {
+    if (HELPERS.isPointerLocked(document.body) && !exitOnly) {
+      HELPERS.exitPointerLock();
+      this._inventoryContainer.visible = true;
+    } else if (!HELPERS.isPointerLocked(document.body)) {
+      HELPERS.requestPointerLock(document.body);
+      this._inventoryContainer.visible = false;
+    }
   }
 
   onAdded() {
@@ -53,7 +96,7 @@ export default class Ui extends DisplayObject {
         return;
 
       this._activeItemPos += Math.round(e.deltaY / 100);
-      this._activeItemPos = (this._activeItemPos + this._items.length) % this._items.length;
+      this._activeItemPos = (this._activeItemPos + 9) % 9;
 
       this._inventoryBar.setSliderPosition(this._activeItemPos);
     });
@@ -67,10 +110,18 @@ export default class Ui extends DisplayObject {
 
     const bounds = new Rectangle(0, 0, this.stage.bounds.width, this.stage.bounds.height);
     const inventoryBar = this._inventoryBar;
+    const inventory = this._inventory;
 
     inventoryBar.alignAnchor(0.5, 1);
     inventoryBar.x = bounds.center().x;
     inventoryBar.y = bounds.bottom;
+
+    inventory.alignAnchor(0.5);
+    inventory.x = bounds.center().x;
+    inventory.y = bounds.center().y - inventoryBar.height;
+
+    this._overlay.set(bounds);
+    this._inventoryOverlay.set(bounds);
 
     this._debugLog && this._debugLog.onResize(bounds.clone());
   }

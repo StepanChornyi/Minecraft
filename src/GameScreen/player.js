@@ -40,18 +40,18 @@ export default class Player extends Object3D {
   init() {
     const sensitivity = 0.0017;
 
-    document.onclick = () => HELPERS.requestPointerLock(document.body);
+    // document.onclick = () => HELPERS.requestPointerLock(document.body);
 
-    document.onkeydown = (e) => {
-      if (e.keyCode !== 69)
-        return;
+    // document.onkeydown = (e) => {
+    //   if (e.keyCode !== 69)
+    //     return;
 
-      if (HELPERS.isPointerLocked(document.body)) {
-        HELPERS.exitPointerLock();
-      } else {
-        HELPERS.requestPointerLock(document.body)
-      }
-    }
+    //   if (HELPERS.isPointerLocked(document.body)) {
+    //     HELPERS.exitPointerLock();
+    //   } else {
+    //     HELPERS.requestPointerLock(document.body)
+    //   }
+    // }
 
     document.addEventListener('pointermove', (evt) => {
       if (!HELPERS.isPointerLocked(document.body))

@@ -8,6 +8,8 @@ import mainTexture from 'assets/textures/texture.png';
 import sunTexture from 'assets/textures/sun.png';
 import testTex from 'assets/textures/tex_test.png';
 import transparentTexture from 'assets/textures/transparent.png';
+import craftingMenu from 'assets/textures/craft.png';
+
 
 // import chunkVsGLSL from 'shaders/chunk/chunk.vs.glsl';
 // import chunkFsGLSL from 'shaders/chunk/chunk.fs.glsl';
@@ -108,6 +110,7 @@ export class Preloader extends DisplayObject {
     assets.enqueueImage('iconsSheet', iconsSheet);
     assets.enqueueImage('testTex', testTex);
     assets.enqueueImage('transparentTexture', transparentTexture);
+    assets.enqueueImage('craftingMenu', craftingMenu);
   }
 
   _enqueueSounds() {

@@ -33,6 +33,8 @@ export default class GameScreen extends DisplayObject {
   constructor() {
     super();
 
+    this.touchable = true;
+
     // console.log(gl.getSupportedExtensions());
 
     gl.getExtension('OES_standard_derivatives') ||
@@ -150,6 +152,7 @@ export default class GameScreen extends DisplayObject {
       drop.once("collected", () => {
         Black.audio.play("item", "master", 0.4);
 
+        this.ui.collectItem(drop.blockType);
       });
 
       if (BLOCK_SOUND[block.type]) {

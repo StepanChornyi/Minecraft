@@ -23,9 +23,14 @@ export default class ItemIcon extends DisplayObject {
     const texture = this._texture;
     const textureRegion = this._textureRegion;
 
-    const regionIndex = ICONS_MAP[blockType];
+    let regionIndex = ICONS_MAP[blockType];
     const regionSize = 32;
     const regionsCount = 16;
+
+    
+    if(isNaN(regionIndex)){
+      regionIndex = 250
+    }
 
     textureRegion.set(
       regionSize * (regionIndex % regionsCount),
@@ -63,4 +68,10 @@ ICONS_MAP[BLOCK_TYPE.BEDROCK] = 8;
 ICONS_MAP[BLOCK_TYPE.TORCH] = 214;
 ICONS_MAP[BLOCK_TYPE.LEAVES] = 23;
 ICONS_MAP[BLOCK_TYPE.WATER] = 9;
+ICONS_MAP[BLOCK_TYPE.SAND] = 11;
+ICONS_MAP[BLOCK_TYPE.SANDSTONE] = 29;
+ICONS_MAP[BLOCK_TYPE.ROSE] = 226;
+ICONS_MAP[BLOCK_TYPE.GRASS] = 227;
+ICONS_MAP[BLOCK_TYPE.DEAD_BUSH] = 228;
+ICONS_MAP[BLOCK_TYPE.CACTUS] = 75;
 

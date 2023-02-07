@@ -23,8 +23,16 @@ export default class InventoryBar extends DisplayObject {
   }
 
   setItems(items) {
-    for (let i = 0; i < items.length; i++) {
-      this._icons[i].setBlockType(items[i]);
+    for (let i = 0; i < 9; i++) {
+      const icon = this._icons[i];
+      const item = items[i];
+
+      if (item) {
+        icon.visible = true;
+        icon.setBlockType(item.type);
+      } else {
+        icon.visible = false;
+      }
     }
   }
 
