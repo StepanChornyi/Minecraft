@@ -47,7 +47,7 @@ export default class Ui extends DisplayObject {
 
     inventoryContainer.touchable = true;
     inventoryContainer.add(inventoryOverlay, inventory);
-    // inventoryContainer.visible = false;
+    inventoryContainer.visible = false;
 
     overlay.touchable = true;
     overlay.on('pointerDown', () => {

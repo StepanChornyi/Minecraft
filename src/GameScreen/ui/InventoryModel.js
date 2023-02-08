@@ -40,6 +40,15 @@ export default class InventoryModel extends MessageDispatcher {
     }
   }
 
+  moveItem(index, newIndex) {
+    const item = this._items[index];
+
+    this._items[index] = this._items[newIndex];
+    this._items[newIndex] = item;
+
+    this.post("change");
+  }
+
   get items() {
     return this._items;
   }

@@ -22,11 +22,11 @@ export default class Player extends Object3D {
     this.world = world;
     this.camera = camera;
 
-    this.velocity = new Vector3();
-    this.acceleration = new Vector3();
-    this.dampingWalk = new Vector3(0.87, 0.99, 0.87);
-    this.dampingStand = new Vector3(0.85, 0.99, 0.85);
-    this.dampingFall = new Vector3(0.83, 0.99, 0.83);
+    // this.velocity = new Vector3();
+    // this.acceleration = new Vector3();
+    // this.dampingWalk = new Vector3(0.87, 0.99, 0.87);
+    // this.dampingStand = new Vector3(0.85, 0.99, 0.85);
+    // this.dampingFall = new Vector3(0.83, 0.99, 0.83);
 
     this.body = new PhysicsBody(world, size);
 

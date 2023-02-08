@@ -5,6 +5,8 @@ export default class ItemIcon extends DisplayObject {
   constructor() {
     super();
 
+    this.touchable = true;
+
     this._texture = new Texture(Black.assets.getTexture('iconsSheet').native);
     this._textureRegion = new Rectangle();
 
@@ -19,6 +21,39 @@ export default class ItemIcon extends DisplayObject {
     this._updateTexture(blockType);
   }
 
+  _init() {
+    const icon = this._icon = new Sprite(this._texture);
+
+    icon.scale = 0.85;
+    icon.alignAnchor();
+
+    this.add(icon);
+
+    icon.touchable = true;
+
+    let isPressed = false;
+
+    this.on("pointerDown", () => {
+      isPressed = true;
+
+      this.parent.setChildIndex(this, this.parent.numChildren - 1);
+    });
+
+    this.on("pointerUp", () => {
+      isPressed = false;
+      this.post("released");
+    });
+
+    Black.stage.on("pointerMove", () => {
+      if (isPressed) {
+        const local = this.parent.globalToLocal(Black.input.pointerPosition);
+
+        this.x = local.x;
+        this.y = local.y;
+      }
+    })
+  }
+
   _updateTexture(blockType) {
     const texture = this._texture;
     const textureRegion = this._textureRegion;
@@ -27,8 +62,8 @@ export default class ItemIcon extends DisplayObject {
     const regionSize = 32;
     const regionsCount = 16;
 
-    
-    if(isNaN(regionIndex)){
+
+    if (isNaN(regionIndex)) {
       regionIndex = 250
     }
 
@@ -40,15 +75,6 @@ export default class ItemIcon extends DisplayObject {
     );
 
     texture.set(texture.native, textureRegion);
-  }
-
-  _init() {
-    const icon = this._icon = new Sprite(this._texture);
-
-    icon.scale = 0.85;
-    icon.alignAnchor();
-
-    this.add(icon);
   }
 }
 

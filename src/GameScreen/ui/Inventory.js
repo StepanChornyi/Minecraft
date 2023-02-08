@@ -64,7 +64,9 @@ export default class Inventory extends FixedSizeDisplayObject {
     //   this._icons.push(icon);
     // }  
 
-    slotsContainer.touchable = true;
+    itemsContainer.touchable = true;
+  
+    // slotsContainer.touchable = true;
 
     for (let y = 0; y < model.itemsRows; y++) {
       for (let x = 0; x < model.itemsCols; x++) {
@@ -107,16 +109,44 @@ export default class Inventory extends FixedSizeDisplayObject {
 
         this._itemsContainer.addChild(item);
 
-        item.scale = 0.85;
+        item.on('released', () => {
+          const newItemIndex = this._getSlotIndex(item.x, item.y);
 
-        item.x = slots[i].x + slotSize * 0.5;
-        item.y = slots[i].y + slotSize * 0.5;
+          if (newItemIndex < 0) {
+            this._alignItem(i);
+          } else {
+            this._model.moveItem(i, newItemIndex);
+          }
+        })
       }
 
       item = items[i];
 
+      this._alignItem(i);
+
       item.setBlockType(modelItems[i].type);
     }
+  }
+
+  _alignItem(index) {
+    const item = this._items[index];
+
+    item.scale = 0.85;
+
+    item.x = this._slots[index].x + slotSize * 0.5;
+    item.y = this._slots[index].y + slotSize * 0.5;
+  }
+
+  _getSlotIndex(x, y) {
+    for (let i = 0; i < this._slots.length; i++) {
+      const slot = this._slots[i];
+
+      if (x > slot.x && x < slot.x + slotSize && y > slot.y && y < slot.y + slotSize) {
+        return i;
+      }
+    }
+
+    return -1;
   }
 
   _alignSlot(slot, x, y, index) {

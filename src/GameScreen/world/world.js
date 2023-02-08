@@ -344,6 +344,7 @@ export default class World extends MessageDispatcher {
 
     // BlocksManager.count();
 
+    ///TODO - optimize this piece of shit
     for (let i = 0; i < this.chunks.length; i++) {
       for (let j = 0; j < this.chunks[i].subChunks.length; j++) {
         const subChunk = this.chunks[i].subChunks[j];
