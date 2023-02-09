@@ -2,6 +2,9 @@ import { Black } from 'black-engine';
 import Mesh from './mesh';
 import WEBGL_UTILS from '../../utils/webgl-utils';
 
+import vs from './chunk_transparent.vs.glsl';
+import fs from './chunk_transparent.fs.glsl';
+
 let gl = null;
 let program = null;
 let texture = null;
@@ -21,7 +24,7 @@ export default class ChunkTransparentMesh extends Mesh {
     gl = gl_context;
 
     if (!program) {
-      program = WEBGL_UTILS.createProgram(gl, Black.assets.getXHRAsset('chunk-transparent-vs'), Black.assets.getXHRAsset('chunk-transparent-fs'));
+      program = WEBGL_UTILS.createProgram(gl, vs, fs);
 
       positionAttribLocation = gl.getAttribLocation(program, 'vertPosition');
       texCoordAttribLocation = gl.getAttribLocation(program, 'vertTexCoord');
@@ -84,7 +87,7 @@ export default class ChunkTransparentMesh extends Mesh {
     gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, this.transformMatrix);
 
     gl.drawElements(gl.TRIANGLES, this.indices.length, gl.UNSIGNED_SHORT, 0);
-    
+
     gl.depthMask(true);
   }
 

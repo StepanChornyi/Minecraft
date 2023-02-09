@@ -10,12 +10,6 @@ import testTex from 'assets/textures/tex_test.png';
 import transparentTexture from 'assets/textures/transparent.png';
 import craftingMenu from 'assets/textures/craft.png';
 
-
-// import chunkVsGLSL from 'shaders/chunk/chunk.vs.glsl';
-// import chunkFsGLSL from 'shaders/chunk/chunk.fs.glsl';
-import chunkTransparentFsGLSL from 'shaders/chunk/chunk_transparent.fs.glsl';
-import chunkTransparentVsGLSL from 'shaders/chunk/chunk_transparent.vs.glsl';
-
 import grassSong1 from 'assets/audio/grass1.ogg';
 import grassSong2 from 'assets/audio/grass2.ogg';
 import grassSong3 from 'assets/audio/grass3.ogg';
@@ -35,8 +29,6 @@ import woodSong4 from 'assets/audio/wood4.ogg';
 import item from 'assets/audio/item.mp3';
 
 import CustomAssetManager from './libs/custom-asset-manager';
-
-// import Minecraft from './minecraft/minecraft';
 
 export class Preloader extends DisplayObject {
   constructor() {
@@ -75,8 +67,6 @@ export class Preloader extends DisplayObject {
 
     // Listen for a complete message
     this._assets.on('complete', () => this.post("complete"));
-
-    // Start preloading all enqueued assets
   }
 
   loadPreloader() {
@@ -91,11 +81,6 @@ export class Preloader extends DisplayObject {
 
     this._enqueueImages();
     this._enqueueSounds();
-
-    // assets.enqueueXHR('chunk-vs', chunkVsGLSL);
-    // assets.enqueueXHR('chunk-fs', chunkFsGLSL);
-    assets.enqueueXHR('chunk-transparent-fs', chunkTransparentFsGLSL);
-    assets.enqueueXHR('chunk-transparent-vs', chunkTransparentVsGLSL);
 
     assets.loadQueue();
   }
