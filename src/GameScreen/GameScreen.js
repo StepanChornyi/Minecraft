@@ -263,9 +263,7 @@ export default class GameScreen extends DisplayObject {
   }
 
   update(dt) {
-    if ((Date.now() - this._startTime) / 1000 < 300) {
-      this.world.onUpdate();
-    }
+    this.world.onUpdate();
 
     if (!this._initCompleted)
       return;
