@@ -10,7 +10,7 @@
     });
   }
 
-  console.log(`${obj}`);
+  obj.download();
 }*/
 
 export class ChunkOBJExporter {
@@ -81,6 +81,17 @@ export class OBJ {
     this.f = [];
 
     this.fOffset = 0;
+  }
+
+  download(fileName = "minecraft_chunks") {
+    const anchor = document.createElement("a");
+
+    anchor.href = `data:text/plain;charset=utf-8,${this}`;
+    anchor.download = `${fileName}.obj`;
+
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
   }
 
   toString() {
