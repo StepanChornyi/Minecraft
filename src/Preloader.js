@@ -37,34 +37,6 @@ export class Preloader extends DisplayObject {
     // Pick default AssetManager
     this._assets = new CustomAssetManager();
 
-    // load images, make sure to import them first
-    // assets.enqueueImage('anvil', anvil);
-
-
-    // const data = 0b1101100111010010;
-
-    // pb(data);
-    // pb(clearBlockLight(data));
-
-    // function clearBlockLight(v) {
-    //   return (v | 0x00ff) ^ 0x00ff;
-    // }
-
-    // function pb(number, l = 16) {
-    //   let s = number.toString(2);
-
-    //   while (s.length < l) {
-    //     s = '0' + s;
-    //   }
-
-    //   console.log(s);
-    // }
-
-    // XHRAssetLoader
-
-    // load font
-    // assets.enqueueGoogleFont('Titillium Web');
-
     // Listen for a complete message
     this._assets.on('complete', () => this.post("complete"));
   }
@@ -96,6 +68,7 @@ export class Preloader extends DisplayObject {
     assets.enqueueImage('testTex', testTex);
     assets.enqueueImage('transparentTexture', transparentTexture);
     assets.enqueueImage('craftingMenu', craftingMenu);
+    assets.enqueueImage('testSize', testSize);
   }
 
   _enqueueSounds() {
@@ -121,3 +94,39 @@ export class Preloader extends DisplayObject {
   }
 }
 
+    // const data = 0b1101100111010010;
+
+    // pb(data);
+    // pb(clearBlockLight(data));
+
+    // function clearBlockLight(v) {
+    //   return (v | 0x00ff) ^ 0x00ff;
+    // }
+
+    // function pb(number, l = 16) {
+    //   let s = number.toString(2);
+
+    //   while (s.length < l) {
+    //     s = '0' + s;
+    //   }
+
+    //   console.log(s);
+    // }
+
+    // XHRAssetLoader
+
+    // load font
+    // assets.enqueueGoogleFont('Titillium Web');
+
+
+///FETCH ASSET SIZE
+// fetch(url, {
+//   headers: {
+//     Range: "bytes=0-0",
+//   },
+// }).then((response => {
+//   if (response.headers.has("Content-Range")) {
+//     const contentRange = response.headers.get("Content-Range");
+//     const bytes = +contentRange.split('/')[1];
+//   }
+// }));
