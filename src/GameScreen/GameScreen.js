@@ -19,6 +19,8 @@ import BlocksManager from './world/blocks/BlocksManager';
 import CONFIG from './world/config';
 import FallingBlockEntity from './entities/FallingBlockEntity/FallingBlockEntity';
 import Drop from './entities/Drop/Drop';
+import FrameBuffer from '../Utils3D/FrameBuffer';
+import Quad from './meshes/Quad/Quad';
 
 const canvas = document.getElementById("canvas3D");
 const gl = WEBGL_UTILS.getWebGlContext(canvas);
@@ -34,6 +36,8 @@ export default class GameScreen extends DisplayObject {
     super();
 
     this.touchable = true;
+
+
 
     // console.log(gl.getSupportedExtensions());
 
@@ -52,6 +56,52 @@ export default class GameScreen extends DisplayObject {
     this.skyMesh = new SkyMesh(gl);
     this.blockk = new Blockk(gl, this.world);
     this.particles = new ParticlesMesh(gl, this.world);
+
+    const pos3D = glMatrix.vec4.create();
+    const tmp = glMatrix.vec4.create();
+
+    pos3D[0] = 8;
+    pos3D[1] = 25;
+    pos3D[2] = 8;
+    pos3D[3] = 1;
+
+    const pp = this.particles.emitOne(pos3D[0], pos3D[1], pos3D[2], BLOCK_TYPE.CACTUS);
+
+    pp.isStatic = true;
+    // viewMatrix
+
+    // projectionMatrix
+
+
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "KeyR") {
+        glMatrix.vec4.copy(tmp, pos3D);
+
+        glMatrix.vec4.transformMat4(tmp, tmp, this.camera.viewMatrix);
+
+        glMatrix.vec4.transformMat4(tmp, tmp, this.camera.projectionMatrix);
+
+        const ivsProj = glMatrix.mat4.invert(glMatrix.mat4.create(), this.camera.viewMatrix)
+        const ivsView = glMatrix.mat4.invert(glMatrix.mat4.create(), this.camera.projectionMatrix)
+
+        console.log([tmp[0]/tmp[3], tmp[1]/tmp[3], tmp[2]]);
+
+        // glMatrix.vec4.transformMat4(tmp, tmp, ivsView);
+        // glMatrix.vec4.transformMat4(tmp, tmp, ivsProj);
+
+        // console.log([...tmp]);
+        console.log("============");
+
+      }
+
+
+    });
+
+    this.frameBuffer = new FrameBuffer(gl);
+    this.quad = new Quad(gl);
+
+    this.quad.texture = this.frameBuffer.renderBuffer;
 
     this.entities = [];
 
@@ -221,6 +271,8 @@ export default class GameScreen extends DisplayObject {
 
     // const { chunkX, chunkZ, blockX, blockZ } = intersection ? world.getChunkCoord(intersection[0], intersection[2]) : {};
 
+    this.frameBuffer.bind()
+
     for (let i = 0; i < world.chunks.length; i++) {
       const chunk = world.chunks[i];
 
@@ -228,10 +280,16 @@ export default class GameScreen extends DisplayObject {
         continue;
 
       for (let j = 0; j < chunk.subChunks.length; j++) {
-        chunk.subChunks[j].mesh.render(camera);
+        // chunk.subChunks[j].mesh.render(camera);
+        chunk.subChunks[j].mesh.renderShadow(camera);
       }
 
     }
+
+    this.frameBuffer.unbind();
+
+    this.quad.render(camera);
+
 
     this.particles.render(camera);
 
@@ -364,6 +422,8 @@ export default class GameScreen extends DisplayObject {
     gl.viewport(0, 0, canvas.width, canvas.height);
 
     this.camera.aspect = canvas.width / canvas.height;
+
+    this.frameBuffer.setSize(canvas.width, canvas.height, 0.5);
   }
 }
 

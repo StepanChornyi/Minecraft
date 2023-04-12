@@ -23,6 +23,10 @@ let matWorldUniformLocation;
 let matViewUniformLocation;
 let matProjUniformLocation;
 
+let defaultData;
+let shadowData;
+let currentData;
+
 export default class ChunkMesh extends Mesh {
   constructor(gl_context,) {
     gl = gl_context;
@@ -33,15 +37,27 @@ export default class ChunkMesh extends Mesh {
 
       // program = programShadow;
 
-      positionAttribLocation = gl.getAttribLocation(program, 'vertPosition');
-      texCoordAttribLocation = gl.getAttribLocation(program, 'vertTexCoord');
-      faceLightAttribLocation = gl.getAttribLocation(program, 'faceLight');
-      blockIndexAttribLocation = gl.getAttribLocation(program, 'blockIndex');
+      defaultData = currentData = {
+        positionAttribLocation: gl.getAttribLocation(program, 'vertPosition'),
+        texCoordAttribLocation: gl.getAttribLocation(program, 'vertTexCoord'),
+        faceLightAttribLocation: gl.getAttribLocation(program, 'faceLight'),
+        blockIndexAttribLocation: gl.getAttribLocation(program, 'blockIndex'),
+        hightLightIndexUniformLocation: gl.getUniformLocation(program, 'hightLightIndex'),
+        matWorldUniformLocation: gl.getUniformLocation(program, 'mWorld'),
+        matViewUniformLocation: gl.getUniformLocation(program, 'mView'),
+        matProjUniformLocation: gl.getUniformLocation(program, 'mProj'),
+      };
 
-      hightLightIndexUniformLocation = gl.getUniformLocation(program, 'hightLightIndex');
-      matWorldUniformLocation = gl.getUniformLocation(program, 'mWorld');
-      matViewUniformLocation = gl.getUniformLocation(program, 'mView');
-      matProjUniformLocation = gl.getUniformLocation(program, 'mProj');
+      shadowData = {
+        positionAttribLocation: gl.getAttribLocation(programShadow, 'vertPosition'),
+        texCoordAttribLocation: gl.getAttribLocation(programShadow, 'vertTexCoord'),
+        faceLightAttribLocation: gl.getAttribLocation(programShadow, 'faceLight'),
+        blockIndexAttribLocation: gl.getAttribLocation(programShadow, 'blockIndex'),
+        hightLightIndexUniformLocation: gl.getUniformLocation(programShadow, 'hightLightIndex'),
+        matWorldUniformLocation: gl.getUniformLocation(programShadow, 'mWorld'),
+        matViewUniformLocation: gl.getUniformLocation(programShadow, 'mView'),
+        matProjUniformLocation: gl.getUniformLocation(programShadow, 'mProj'),
+      };
     }
 
     ChunkMesh._initTexture();
@@ -63,7 +79,9 @@ export default class ChunkMesh extends Mesh {
   }
 
   render(camera, blockIndex = null) {
-    gl.useProgram(program);
+    const { hightLightIndexUniformLocation, matProjUniformLocation, matViewUniformLocation, matWorldUniformLocation } = currentData;
+
+    gl.useProgram(this.program);
 
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
@@ -93,12 +111,16 @@ export default class ChunkMesh extends Mesh {
 
   renderShadow(camera, blockIndex) {
     this.program = programShadow;
+    currentData = shadowData;
     this.render(camera, blockIndex);
     this.program = program;
+    currentData = defaultData;
   }
 
   updateAttribPointers() {
     super.updateAttribPointers();
+
+    const { positionAttribLocation, texCoordAttribLocation, faceLightAttribLocation, blockIndexAttribLocation } = currentData;
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
 

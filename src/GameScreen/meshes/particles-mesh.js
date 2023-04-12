@@ -70,6 +70,7 @@ class Particle {
     this.size = 0;
     this.rnd = 0;
     this.texture = { x: 0, y: 0 };
+    this.isStatic = false;
   }
 }
 
@@ -127,6 +128,8 @@ export default class ParticlesMesh extends Mesh {
     p.texture.y = blockSideUVOffset + MESH_TEXTURES[type][key][1] * (blockSideUVSize + blockSideUVOffset * 2);
 
     this._particles.push(p);
+
+    return p;
   }
 
   _update() {
@@ -134,6 +137,12 @@ export default class ParticlesMesh extends Mesh {
 
     for (let i = 0; i < this._particles.length; i++) {
       const p = this._particles[i];
+
+      if(p.isStatic){
+        particles.push(p);
+
+        continue;
+      }
 
       const prevSize = Math.round(p.size);
 
@@ -165,7 +174,7 @@ export default class ParticlesMesh extends Mesh {
 
       const block = this.world.getBlock(Math.floor(p.position.x), Math.floor(p.position.y), Math.floor(p.position.z));
 
-      if (!block.isTransparent) {
+      if (!block || !block.isTransparent) {
         p.size = 0;
         continue;
       }

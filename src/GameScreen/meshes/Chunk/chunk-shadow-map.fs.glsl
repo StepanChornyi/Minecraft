@@ -4,7 +4,7 @@ precision mediump float;
 varying vec2 fragTexCoord;
 varying float fragLight;
 varying float fogVal;
-varying vec3 pos;
+varying vec4 pos;
 
 uniform sampler2D sampler;
 
@@ -26,33 +26,32 @@ void main() {
   // if(mipmapLevel > 0.5) {
   //   gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
   // } else {
-  vec3 fogColor = pos.xyz;
 
-  float x = pos.x;
+  // float x = pos.x;
 
-  if(x > 1.0) {
-    x = 0.0;
-  } else if(x < 0.0) {
-    x = 1.0;
-  }
+  // if(x > 1.0) {
+  //   x = 0.0;
+  // } else if(x < 0.0) {
+  //   x = 1.0;
+  // }
 
-  float y = pos.y;
+  // float y = pos.y;
 
-  if(y > 1.0) {
-    y = 0.0;
-  } else if(y < 0.0) {
-    y = 1.0;
-  }
+  // if(y > 1.0) {
+  //   y = 0.0;
+  // } else if(y < 0.0) {
+  //   y = 1.0;
+  // }
 
-  float z = pos.z;
+  // float z = pos.z;
 
-  if(z > 1.0) {
-    z = 0.0;
-  } else if(z < 0.0) {
-    z = 1.0;
-  }
+  // if(z > 1.0) {
+  //   z = 0.0;
+  // } else if(z < 0.0) {
+  //   z = 1.0;
+  // }
 
-  vec3 col = pos * fragLight;
+  vec3 col = (pos.xyz / pos.w + 1.0) * 0.5 * fragLight;
 
   // gl_FragColor = vec4(vec3(1.0, 1.0, 1.0) * fragLight, 1.0);
   gl_FragColor = vec4(col, 1.0);

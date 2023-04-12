@@ -1,6 +1,6 @@
 import { LoaderType, AssetManager, GameObject, AssetType, Asset, Debug, DisplayObject } from 'black-engine';
 
-import { Preloader } from './preloader';
+import { Preloader } from './Preloader';
 
 import GameScreen from './GameScreen/GameScreen';
 import LoadingScreen from './LoadingScreen/LoadingScreen';
