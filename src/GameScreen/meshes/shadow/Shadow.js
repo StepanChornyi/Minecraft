@@ -34,7 +34,7 @@ export default class Shadow extends Mesh {
       8,
       24,
       8,
-      300
+      500
     );
 
     this.drawBuffersData();
@@ -60,8 +60,8 @@ export default class Shadow extends Mesh {
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
 
-    gl.disable(gl.BLEND);
-    gl.colorMask(true, true, true, false);
+    gl.enable(gl.BLEND);
+    gl.colorMask(true, true, true, true);
 
     this.updateAttribPointers();
 
@@ -69,7 +69,8 @@ export default class Shadow extends Mesh {
 
     gl.uniformMatrix4fv(matProjUniformLocation, gl.FALSE, camera.projectionMatrix);
     gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, camera.viewMatrix);
-    gl.uniformMatrix4fv(matViewUniformLocation, gl.FALSE, camera.viewMatrix);
+    gl.uniformMatrix4fv(gl.getUniformLocation(program, 'mProjIvs'), gl.FALSE, glMatrix.mat4.invert(glMatrix.mat4.create(), camera.projectionMatrix));
+    gl.uniform2f(gl.getUniformLocation(program, 'screenSize'), window.innerWidth, window.innerHeight);
 
     if(this.texture){
       gl.bindTexture(gl.TEXTURE_2D, this.texture);

@@ -51,7 +51,7 @@ void main() {
   //   z = 1.0;
   // }
 
-  vec3 col = (pos.xyz / pos.w + 1.0) * 0.5 * fragLight;
+  vec3 col = (pos.xyz / pos.w + 1.0) * 0.5 ;//* fragLight
 
   // gl_FragColor = vec4(vec3(1.0, 1.0, 1.0) * fragLight, 1.0);
   gl_FragColor = vec4(col, 1.0);

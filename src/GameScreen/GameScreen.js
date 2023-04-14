@@ -337,7 +337,7 @@ export default class GameScreen extends DisplayObject {
 
     this.shadow.texture = this.frameBuffer.renderBuffer;
 
-    this.quad.render(camera);
+    // this.quad.render(camera);
 
     this.shadow.render(camera);
 
