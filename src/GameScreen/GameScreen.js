@@ -21,6 +21,7 @@ import FallingBlockEntity from './entities/FallingBlockEntity/FallingBlockEntity
 import Drop from './entities/Drop/Drop';
 import FrameBuffer from '../Utils3D/FrameBuffer';
 import Quad from './meshes/Quad/Quad';
+import Shadow from './meshes/shadow/Shadow';
 
 const canvas = document.getElementById("canvas3D");
 const gl = WEBGL_UTILS.getWebGlContext(canvas);
@@ -56,9 +57,11 @@ export default class GameScreen extends DisplayObject {
     this.skyMesh = new SkyMesh(gl);
     this.blockk = new Blockk(gl, this.world);
     this.particles = new ParticlesMesh(gl, this.world);
+    this.shadow = new Shadow(gl);
 
     const pos3D = glMatrix.vec4.create();
     const tmp = glMatrix.vec4.create();
+    const tmp2 = glMatrix.vec4.create();
 
     pos3D[0] = 8;
     pos3D[1] = 25;
@@ -78,17 +81,47 @@ export default class GameScreen extends DisplayObject {
       if (e.code === "KeyR") {
         glMatrix.vec4.copy(tmp, pos3D);
 
+
         glMatrix.vec4.transformMat4(tmp, tmp, this.camera.viewMatrix);
+
+        console.log("viewSpace: ", ...tmp);
 
         glMatrix.vec4.transformMat4(tmp, tmp, this.camera.projectionMatrix);
 
-        const ivsProj = glMatrix.mat4.invert(glMatrix.mat4.create(), this.camera.viewMatrix)
-        const ivsView = glMatrix.mat4.invert(glMatrix.mat4.create(), this.camera.projectionMatrix)
 
-        console.log([tmp[0]/tmp[3], tmp[1]/tmp[3], tmp[2]]);
+
+        // glMatrix.vec4.transformMat4(tmp, tmp, this.camera.projectionMatrix);
+
+        // console.log("proj: ", ...tmp);
+        // console.log("normalizedProjection: ", tmp[0]/tmp[3], tmp[1]/tmp[3], tmp[2]/tmp[3]);
+
+        const ivsProj = glMatrix.mat4.invert(glMatrix.mat4.create(), this.camera.projectionMatrix)
+        // const ivsView = glMatrix.mat4.invert(glMatrix.mat4.create(), this.camera.viewMatrix)
+
+
+        console.log("proj: ", ...tmp);
+
+        tmp[0] = tmp[0]/tmp[3];
+        tmp[1] = tmp[1]/tmp[3];
+        tmp[2] = tmp[2]/tmp[3];
+        tmp[3] = 1;
+
+        // const vec3 = glMatrix.vec4.create();
+
+        // console.log([tmp[0]/tmp[3], tmp[1]/tmp[3], tmp[2]]);
 
         // glMatrix.vec4.transformMat4(tmp, tmp, ivsView);
-        // glMatrix.vec4.transformMat4(tmp, tmp, ivsProj);
+        glMatrix.vec4.transformMat4(tmp, tmp, ivsProj);
+
+        tmp[0] = tmp[0]/tmp[3];
+        tmp[1] = tmp[1]/tmp[3];
+        tmp[2] = tmp[2]/tmp[3];
+
+
+        console.log("ViewRestore: ", ...tmp);
+
+        // console.log("normalizedProjectionRestore: ",  tmp[0]/tmp[3], tmp[1]/tmp[3], tmp[2]/tmp[3]);
+
 
         // console.log([...tmp]);
         console.log("============");
@@ -288,8 +321,25 @@ export default class GameScreen extends DisplayObject {
 
     this.frameBuffer.unbind();
 
+    
+    for (let i = 0; i < world.chunks.length; i++) {
+      const chunk = world.chunks[i];
+
+      if (!chunk.visible)
+        continue;
+
+      for (let j = 0; j < chunk.subChunks.length; j++) {
+        chunk.subChunks[j].mesh.render(camera);
+        // chunk.subChunks[j].mesh.renderShadow(camera);
+      }
+
+    }
+
+    this.shadow.texture = this.frameBuffer.renderBuffer;
+
     this.quad.render(camera);
 
+    this.shadow.render(camera);
 
     this.particles.render(camera);
 
