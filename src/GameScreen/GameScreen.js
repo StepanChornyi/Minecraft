@@ -71,65 +71,6 @@ export default class GameScreen extends DisplayObject {
     const pp = this.particles.emitOne(pos3D[0], pos3D[1], pos3D[2], BLOCK_TYPE.CACTUS);
 
     pp.isStatic = true;
-    // viewMatrix
-
-    // projectionMatrix
-
-
-
-    window.addEventListener("keydown", (e) => {
-      if (e.code === "KeyR") {
-        glMatrix.vec4.copy(tmp, pos3D);
-
-
-        glMatrix.vec4.transformMat4(tmp, tmp, this.camera.viewMatrix);
-
-        console.log("viewSpace: ", ...tmp);
-
-        glMatrix.vec4.transformMat4(tmp, tmp, this.camera.projectionMatrix);
-
-
-
-        // glMatrix.vec4.transformMat4(tmp, tmp, this.camera.projectionMatrix);
-
-        // console.log("proj: ", ...tmp);
-        // console.log("normalizedProjection: ", tmp[0]/tmp[3], tmp[1]/tmp[3], tmp[2]/tmp[3]);
-
-        const ivsProj = glMatrix.mat4.invert(glMatrix.mat4.create(), this.camera.projectionMatrix)
-        // const ivsView = glMatrix.mat4.invert(glMatrix.mat4.create(), this.camera.viewMatrix)
-
-
-        console.log("proj: ", ...tmp);
-
-        tmp[0] = tmp[0]/tmp[3];
-        tmp[1] = tmp[1]/tmp[3];
-        tmp[2] = tmp[2]/tmp[3];
-        tmp[3] = 1;
-
-        // const vec3 = glMatrix.vec4.create();
-
-        // console.log([tmp[0]/tmp[3], tmp[1]/tmp[3], tmp[2]]);
-
-        // glMatrix.vec4.transformMat4(tmp, tmp, ivsView);
-        glMatrix.vec4.transformMat4(tmp, tmp, ivsProj);
-
-        tmp[0] = tmp[0]/tmp[3];
-        tmp[1] = tmp[1]/tmp[3];
-        tmp[2] = tmp[2]/tmp[3];
-
-
-        console.log("ViewRestore: ", ...tmp);
-
-        // console.log("normalizedProjectionRestore: ",  tmp[0]/tmp[3], tmp[1]/tmp[3], tmp[2]/tmp[3]);
-
-
-        // console.log([...tmp]);
-        console.log("============");
-
-      }
-
-
-    });
 
     this.frameBuffer = new FrameBuffer(gl);
     this.quad = new Quad(gl);
@@ -225,6 +166,11 @@ export default class GameScreen extends DisplayObject {
       this.world.destroy(intersection[0], intersection[1], intersection[2]);
 
       const drop = new Drop(gl, this.world, block.type, player);
+      const dropShadow = this.shadow.addShadow();
+
+      dropShadow.r =500;
+
+      drop.attachShadow(dropShadow)
 
       drop.body.x = intersection[0] + 0.5;
       drop.body.y = intersection[1] + 0.5;
@@ -234,6 +180,8 @@ export default class GameScreen extends DisplayObject {
 
       drop.once("collected", () => {
         Black.audio.play("item", "master", 0.4);
+
+        dropShadow.isActive = false;
 
         this.ui.collectItem(drop.blockType);
       });
@@ -321,7 +269,7 @@ export default class GameScreen extends DisplayObject {
 
     this.frameBuffer.unbind();
 
-    
+
     for (let i = 0; i < world.chunks.length; i++) {
       const chunk = world.chunks[i];
 

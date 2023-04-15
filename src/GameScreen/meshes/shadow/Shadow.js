@@ -14,6 +14,23 @@ let gl = null;
 let program = null;
 let texture = null;
 
+class ShadowObj {
+  constructor() {
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+    this.r = 0;
+    this.isActive = true;
+  }
+
+  set(x, y, z, r) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+    this.r = r;
+  }
+}
+
 export default class Shadow extends Mesh {
   constructor(gl_context) {
     gl = gl_context;
@@ -30,14 +47,27 @@ export default class Shadow extends Mesh {
 
     this.texture = null;
 
-    this.vertices.push(
-      8,
-      24,
-      8,
-      500
-    );
+    this._shadows = [];
 
-    this.drawBuffersData();
+
+    // this.addShadow().set(8, 24,8, 500);
+
+    // this.vertices.push(
+    //   8,
+    //   24,
+    //   8,
+    //   500
+    // );
+
+
+  }
+
+  addShadow() {
+    const shadow = new ShadowObj();
+
+    this._shadows.push(shadow);
+
+    return shadow;
   }
 
 
@@ -51,7 +81,39 @@ export default class Shadow extends Mesh {
     // gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.DYNAMIC_DRAW);
   }
 
+  _update() {
+    this.vertices = [];
+
+    if (!this._shadows.length) {
+      return;
+    }
+
+    const shadows = [];
+
+    for (let i = 0; i < this._shadows.length; i++) {
+      const shadow = this._shadows[i];
+
+      if (!shadow.isActive)
+        continue;
+
+      this.vertices.push(
+        shadow.x,
+        shadow.y,
+        shadow.z,
+        shadow.r
+      );
+
+      shadows.push(shadow);
+    }
+
+    this._shadows = shadows;
+
+    this.drawBuffersData();
+  }
+
   render(camera, blockIndex = null) {
+    this._update();
+
     if (!this.vertices.length)
       return;
 
@@ -72,7 +134,7 @@ export default class Shadow extends Mesh {
     gl.uniformMatrix4fv(gl.getUniformLocation(program, 'mProjIvs'), gl.FALSE, glMatrix.mat4.invert(glMatrix.mat4.create(), camera.projectionMatrix));
     gl.uniform2f(gl.getUniformLocation(program, 'screenSize'), window.innerWidth, window.innerHeight);
 
-    if(this.texture){
+    if (this.texture) {
       gl.bindTexture(gl.TEXTURE_2D, this.texture);
       gl.activeTexture(gl.TEXTURE0);
     }
@@ -107,7 +169,7 @@ export default class Shadow extends Mesh {
       4 * Float32Array.BYTES_PER_ELEMENT,
       3 * Float32Array.BYTES_PER_ELEMENT
     );
-  
+
     gl.enableVertexAttribArray(positionAttribLocation);
     gl.enableVertexAttribArray(sizeAttribLocation);
   }

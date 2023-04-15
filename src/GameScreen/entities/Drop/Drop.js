@@ -64,6 +64,7 @@ export default class Drop extends Mesh {
     this.body.velocity.z = MathUtils.rndBtw(0, 0.05) * MathUtils.rndSign();
     this.body.gravity *= 0.6;
 
+    this._shadow = null;
     this._time = Math.random();
     this._light = 0;
     this._collectVelocity = 0;
@@ -74,16 +75,24 @@ export default class Drop extends Mesh {
     this._init();
   }
 
+  attachShadow(shadow) {
+    this._shadow = shadow;
+  }
+
   onUpdate(dt) {
-    if (this.isDestroyed)
+    if (this.isDestroyed) {
+      if (this._shadow)
+        this._shadow.isActive = false;
+
       return;
+    }
 
     this.body.onUpdate(dt);
 
     this._time += dt;
 
     this.position = this.body.position;
-    this.y += (Math.sin(this._time * 0.02) + 1) * 0.05
+    this.y += (Math.sin(this._time * 0.02) + 1) * 0.01 - 0.05
     this.rotationY = this._time * 0.02;
 
     const block = this.world.getBlock(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z));
@@ -119,6 +128,10 @@ export default class Drop extends Mesh {
         this.post('collected');
       }
     }
+
+    this._shadow.x = this.x;
+    this._shadow.y = this.y;
+    this._shadow.z = this.z;
   }
 
   render(camera) {
