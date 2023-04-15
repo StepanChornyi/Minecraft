@@ -70,7 +70,6 @@ class Particle {
     this.size = 0;
     this.rnd = 0;
     this.texture = { x: 0, y: 0 };
-    this.isStatic = false;
   }
 }
 
@@ -96,6 +95,7 @@ export default class ParticlesMesh extends Mesh {
     super(gl, program);
 
     this.world = world;
+    this.texture = null;
 
     this._particles = [];
   }
@@ -137,12 +137,6 @@ export default class ParticlesMesh extends Mesh {
 
     for (let i = 0; i < this._particles.length; i++) {
       const p = this._particles[i];
-
-      if(p.isStatic){
-        particles.push(p);
-
-        continue;
-      }
 
       const prevSize = Math.round(p.size);
 
@@ -226,6 +220,9 @@ export default class ParticlesMesh extends Mesh {
 
     gl.disable(gl.BLEND);
     gl.colorMask(true, true, true, false);
+
+    gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    gl.activeTexture(gl.TEXTURE0);
 
     this.updateAttribPointers();
 

@@ -22,6 +22,7 @@ import Drop from './entities/Drop/Drop';
 import FrameBuffer from '../Utils3D/FrameBuffer';
 import Quad from './meshes/Quad/Quad';
 import Shadow from './meshes/shadow/Shadow';
+import ChunkMesh from './meshes/Chunk/chunk-mesh';
 
 const canvas = document.getElementById("canvas3D");
 const gl = WEBGL_UTILS.getWebGlContext(canvas);
@@ -59,18 +60,9 @@ export default class GameScreen extends DisplayObject {
     this.particles = new ParticlesMesh(gl, this.world);
     this.shadow = new Shadow(gl);
 
-    const pos3D = glMatrix.vec4.create();
-    const tmp = glMatrix.vec4.create();
-    const tmp2 = glMatrix.vec4.create();
 
-    pos3D[0] = 8;
-    pos3D[1] = 25;
-    pos3D[2] = 8;
-    pos3D[3] = 1;
+    this.particles.texture = ChunkMesh._initTexture(gl);
 
-    const pp = this.particles.emitOne(pos3D[0], pos3D[1], pos3D[2], BLOCK_TYPE.CACTUS);
-
-    pp.isStatic = true;
 
     this.frameBuffer = new FrameBuffer(gl);
     this.quad = new Quad(gl);
