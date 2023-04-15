@@ -15,18 +15,20 @@ void main() {
 
   coord = texCoord + coord * offsetFactor;
 
- vec2 textureCoord = (coord + 1.0) * 0.5;
+  vec2 textureCoord = (coord + 1.0) * 0.5;
 
   vec4 color = texture2D(shadowMap, textureCoord);
 
-  vec4 mapData = (mProjIvs * vec4(coord.xy,  (color.z*2.0)-1.0, 1.0));
-  vec3 mapPos = mapData.xyz/mapData.w;
+  float z = (color.r * 255.0 * 255.0 + color.g * 255.0) / 65535.0;
 
-  if(distance(mapPos, viewPos)<0.5){
-  gl_FragColor = vec4(0.0, 1.0, 0.0, 0.5);
+  vec4 mapData = (mProjIvs * vec4(coord.xy, (z * 2.0) - 1.0, 1.0));
+  vec3 mapPos = mapData.xyz / mapData.w;
 
-return;
+  if(distance(mapPos, viewPos) < 0.25) {
+    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.3);
+
+    return;
   }
-
-  gl_FragColor = vec4(color.xyz ,  0.2);
+  discard;
+  // gl_FragColor = vec4(0.0, 0.0, 0.0 ,  0.2);
 }
