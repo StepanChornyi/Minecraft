@@ -59,9 +59,9 @@ export default class Drop extends Mesh {
     this.messages = new MessageDispatcher();
     this.blockType = blockType;
 
-    this.body.velocity.x = MathUtils.rndBtw(0, 0.05) * MathUtils.rndSign();
+    this.body.velocity.x = MathUtils.rndBtw(0, 0.07) * MathUtils.rndSign();
     this.body.velocity.y = MathUtils.rndBtw(0.05, 0.07);
-    this.body.velocity.z = MathUtils.rndBtw(0, 0.05) * MathUtils.rndSign();
+    this.body.velocity.z = MathUtils.rndBtw(0, 0.07) * MathUtils.rndSign();
     this.body.gravity *= 0.6;
 
     this._shadow = null;
@@ -92,7 +92,7 @@ export default class Drop extends Mesh {
     this._time += dt;
 
     this.position = this.body.position;
-    this.y += (Math.sin(this._time * 0.02) + 1) * 0.01 - 0.05
+    this.y += (Math.sin(this._time * 0.02) + 1) * 0.01 - 0.03
     this.rotationY = this._time * 0.02;
 
     const block = this.world.getBlock(Math.floor(this.x), Math.floor(this.y), Math.floor(this.z));
@@ -130,7 +130,7 @@ export default class Drop extends Mesh {
     }
 
     this._shadow.x = this.x;
-    this._shadow.y = this.y;
+    this._shadow.y = this.y - size.y * 0.5;
     this._shadow.z = this.z;
   }
 
