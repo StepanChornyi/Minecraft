@@ -10,7 +10,6 @@ uniform mat4 mProjIvs;
 uniform sampler2D shadowMap;
 
 void main() {
-
   vec2 coord = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y) * 2.0 - 1.0;
 
   coord = texCoord + coord * offsetFactor;
@@ -26,9 +25,8 @@ void main() {
 
   if(distance(mapPos, viewPos) < 0.15) {
     gl_FragColor = vec4(0.0, 0.0, 0.0, 0.3);
-
     return;
   }
+
   discard;
-  // gl_FragColor = vec4(0.0, 0.0, 0.0 ,  0.2);
 }
