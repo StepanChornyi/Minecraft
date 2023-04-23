@@ -1,6 +1,7 @@
-import { Rectangle, DisplayObject, Black, Sprite, Graphics, TextField } from 'black-engine';
+import { Rectangle, DisplayObject, Black, Sprite, Graphics, TextField, Vector } from 'black-engine';
 import FixedSizeDisplayObject from '../../libs/FixedSizeDisplayObject';
 import ItemIcon from './item-icon';
+import InventoryModel from './InventoryModel';
 
 const slotSize = 25;
 
@@ -11,6 +12,7 @@ export default class Inventory extends FixedSizeDisplayObject {
     this.touchable = true;
 
     this._model = model;
+    this._craftingModel = new InventoryModel(2, 2);
     this._bg = null;
     this._slots = [];
     this._items = [];
@@ -51,8 +53,9 @@ export default class Inventory extends FixedSizeDisplayObject {
     const bg = this._bg = new Sprite('craftingMenu');
     const slotsContainer = this._slotsContainer = new DisplayObject();
     const itemsContainer = this._itemsContainer = new DisplayObject();
+    const itemDNDContainer = this._itemDNDContainer = new DisplayObject();
 
-    bg.scale = 0.5;
+    this.scale = 0.5;
     bg.touchable = true;
     // const slider = this._slider = new Sprite('inventoryBarSlider');
 
@@ -65,27 +68,61 @@ export default class Inventory extends FixedSizeDisplayObject {
     // }  
 
     itemsContainer.touchable = true;
-  
+    itemDNDContainer.touchable = true;
+
     // slotsContainer.touchable = true;
 
-    for (let y = 0; y < model.itemsRows; y++) {
-      for (let x = 0; x < model.itemsCols; x++) {
-        const slot = new ItemSlot();
-        const index = model.getSlotIndex(x, y);
+    const slotsGroupBottom = new SlotsGroup(1, model.itemsCols);
+    const slotsGroupTop = new SlotsGroup(model.itemsRows - 1, model.itemsCols);
+    const slotsGroupCraft = this._slotsGroupCraft = new SlotsGroup(2, 2);
+    const slotsGroupCraftResult = new SlotsGroup(1, 1);
 
-        slot.touchable = true;
+    // this._slots[index] = slot;
 
-        slot._text && (slot._text.text = `${index}`);
+    this._slots.push(...slotsGroupBottom.slots);
+    this._slots.push(...slotsGroupTop.slots);
 
-        this._slots[index] = slot;
+    this.slotGroups = [slotsGroupBottom, slotsGroupTop, slotsGroupCraft, slotsGroupCraftResult];
 
-        this._alignSlot(slot, x, y, index);
+    slotsContainer.add(...this.slotGroups);
 
-        slotsContainer.add(slot);
-      }
-    }
+    slotsGroupCraft.x = 255;
+    slotsGroupCraft.y = 69;
 
-    this.add(bg, slotsContainer, itemsContainer);
+    slotsGroupCraftResult.x = 423;
+    slotsGroupCraftResult.y = 99;
+
+    slotsGroupBottom.x = 15;
+    slotsGroupBottom.y = 417;
+
+    slotsGroupTop.x = 15;
+    slotsGroupTop.y = 243;
+
+    this.overlay = new Graphics();
+
+    const size = 48;
+
+    this.overlay.fillStyle(0xffffff, 0.5);
+    this.overlay.beginPath();
+    this.overlay.rect(-size * 0.5, -size * 0.5, size, size);
+    this.overlay.closePath();
+    this.overlay.fill();
+    this.overlay.visible = false;
+
+    this.add(bg, slotsContainer, itemsContainer, this.overlay, itemDNDContainer);
+
+    slotsGroupBottom.on("hover", this._onHover, this);
+    slotsGroupTop.on("hover", this._onHover, this);
+    slotsGroupCraft.on("hover", this._onHover, this);
+    slotsGroupCraftResult.on("hover", this._onHover, this);
+  }
+
+  _onHover(_, p) {
+    const localPoint = this.globalToLocal(p);
+
+    this.overlay.x = localPoint.x;
+    this.overlay.y = localPoint.y;
+    this.overlay.visible = true;
   }
 
   _update() {
@@ -109,11 +146,27 @@ export default class Inventory extends FixedSizeDisplayObject {
 
         this._itemsContainer.addChild(item);
 
+        item.on("pressed", () => {
+          item.parent.removeChild(item);
+          this._itemDNDContainer.addChild(item);
+        });
+
         item.on('released', () => {
-          const newItemIndex = this._getSlotIndex(item.x, item.y);
+          item.parent.removeChild(item);
+          this._itemsContainer.addChild(item);
+
+          const slot = this._getSlot(item.x, item.y);
+          let newItemIndex = this._slots.indexOf(slot);
 
           if (newItemIndex < 0) {
-            this._alignItem(i);
+            newItemIndex = this._slotsGroupCraft.slots.indexOf(slot);
+
+            if (newItemIndex < 0) {
+              this._alignItem(i);
+            } else {
+              this._model.removeItem(item.type);
+              this._alignItem(i, slot);
+            }
           } else {
             this._model.moveItem(i, newItemIndex);
           }
@@ -128,42 +181,37 @@ export default class Inventory extends FixedSizeDisplayObject {
     }
   }
 
-  _alignItem(index) {
-    const item = this._items[index];
-
-    item.scale = 0.85;
-
-    item.x = this._slots[index].x + slotSize * 0.5;
-    item.y = this._slots[index].y + slotSize * 0.5;
+  onUpdate() {
+    this.overlay.visible = false;
   }
 
-  _getSlotIndex(x, y) {
-    for (let i = 0; i < this._slots.length; i++) {
-      const slot = this._slots[i];
+  _alignItem(index, slot = this._slots[index]) {
+    const item = this._items[index];
 
-      if (x > slot.x && x < slot.x + slotSize && y > slot.y && y < slot.y + slotSize) {
-        return i;
+    const slotCenter = item.parent.globalToLocal(slot.parent.localToGlobal(slot.bounds.center()));
+
+    item.scale = 0.85 * 2;
+
+    item.x = slotCenter.x;
+    item.y = slotCenter.y;
+  }
+
+  _getSlot(x, y) {
+    for (let i = 0; i < this.slotGroups.length; i++) {
+      if (this.slotGroups[i].bounds.containsXY(x, y)) {
+        const local = this.slotGroups[i].globalToLocal(this.localToGlobal(new Vector(x, y)));
+
+        for (let j = 0; j < this.slotGroups[i].slots.length; j++) {
+          if (this.slotGroups[i].slots[j].bounds.containsXY(local.x, local.y)) {
+            return this.slotGroups[i].slots[j];
+          }
+        }
+
+        break;
       }
     }
 
-    return -1;
-  }
-
-  _alignSlot(slot, x, y, index) {
-    const offsetTop = 122;
-    const offsetLeft = 8;
-    const size = 25;
-    const offset = 2;
-
-    // slot.draw(size);
-
-    slot.x = offsetLeft + x * (size + offset);
-
-    if (index < 9) {
-      slot.y = offsetTop + 87;
-    } else {
-      slot.y = offsetTop + (y - 1) * (size + offset);
-    }
+    return null;
   }
 
   _getFixedBounds(outRect) {
@@ -171,23 +219,52 @@ export default class Inventory extends FixedSizeDisplayObject {
   }
 }
 
-class ItemSlot extends Graphics {
+class ItemSlot extends Sprite {
   constructor() {
-    super();
-
-    // const text = this._text = new TextField("ASD");
-
-    // this.addChild(text);
-
+    super("slot");
 
     this._itemIcon = null;
   }
+}
 
-  draw(size) {
-    this.fillStyle(0xff0000, 0.5)
-    this.beginPath();
-    this.rect(0, 0, size, size);
-    this.closePath();
-    this.fill();
+class SlotsGroup extends DisplayObject {
+  constructor(rows, cols) {
+    super();
+
+    this.slots = [];
+
+    for (let yy = 0; yy < rows; yy++) {
+      for (let xx = 0; xx < cols; xx++) {
+
+        const slot = new ItemSlot()
+
+        slot.x = slot.width * xx;
+        slot.y = slot.height * yy;
+
+        this.slots.push(slot)
+      }
+    }
+
+    this.add(...this.slots);
+  }
+
+  onUpdate() {
+    const local = this.globalToLocal(Black.input.pointerPosition);
+
+    for (let i = 0; i < this.slots.length; i++) {
+      const { x, y, width, height } = this.slots[i];
+
+      if (new Rectangle(x, y, width, height).containsXY(local.x, local.y)) {
+        this.post("hover", this.localToGlobal(new Vector(x + width * 0.5, y + height * 0.5)))
+
+        return;
+      }
+    }
+  }
+
+  setColor(val) {
+    for (let i = 0; i < this.slots.length; i++) {
+      this.slots[i].color = val;
+    }
   }
 }

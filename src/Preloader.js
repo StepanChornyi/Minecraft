@@ -9,6 +9,7 @@ import sunTexture from 'assets/textures/sun.png';
 import testTex from 'assets/textures/tex_test.png';
 import transparentTexture from 'assets/textures/transparent.png';
 import craftingMenu from 'assets/textures/craft.png';
+import slot from 'assets/textures/slot.png';
 
 import grassSong1 from 'assets/audio/grass1.ogg';
 import grassSong2 from 'assets/audio/grass2.ogg';
@@ -68,6 +69,7 @@ export class Preloader extends DisplayObject {
     assets.enqueueImage('testTex', testTex);
     assets.enqueueImage('transparentTexture', transparentTexture);
     assets.enqueueImage('craftingMenu', craftingMenu);
+    assets.enqueueImage('slot', slot);
   }
 
   _enqueueSounds() {

@@ -1,14 +1,12 @@
 import { Rectangle, DisplayObject, Black, Sprite, Graphics, MessageDispatcher } from 'black-engine';
-import FixedSizeDisplayObject from '../../libs/FixedSizeDisplayObject';
-import ItemIcon from './item-icon';
-
-const itemsCols = 9;
-const itemsRows = 4;
-const slotsCount = itemsCols * itemsRows;
 
 export default class InventoryModel extends MessageDispatcher {
-  constructor() {
+  constructor(cols, rows) {
     super();
+
+    this.cols = cols;
+    this.rows = rows;
+    this.slotsCount = cols * rows;
 
     this._items = [];
   }
@@ -19,7 +17,7 @@ export default class InventoryModel extends MessageDispatcher {
 
   addItem(itemType) {
 
-    for (let i = 0; i < slotsCount; i++) {
+    for (let i = 0; i < this.slotsCount; i++) {
       const item = this._items[i];
 
       if (item && item.type === itemType) {
@@ -29,7 +27,7 @@ export default class InventoryModel extends MessageDispatcher {
       }
     }
 
-    for (let i = 0; i < slotsCount; i++) {
+    for (let i = 0; i < this.slotsCount; i++) {
       const item = this._items[i];
 
       if (!item) {
@@ -37,6 +35,15 @@ export default class InventoryModel extends MessageDispatcher {
 
         return this.post("change");
       }
+    }
+  }
+
+  removeItem(item) {
+    const index = this._items.indexOf(item);
+
+    if (index >= 0) {
+      this._items[index] = null;
+      this.post("change");
     }
   }
 
@@ -54,19 +61,15 @@ export default class InventoryModel extends MessageDispatcher {
   }
 
   getSlotIndex(x, y) {
-    return y * itemsCols + x;
+    return y * this.cols + x;
   }
 
   get itemsCols() {
-    return itemsCols;
+    return this.cols;
   }
 
   get itemsRows() {
-    return itemsRows;
-  }
-
-  get slotsCount() {
-    return slotsCount;
+    return this.rows;
   }
 }
 

@@ -18,9 +18,17 @@ export default class Ui extends DisplayObject {
 
     this._activeItemPos = 0;
 
-    this._inventoryModel = new InventoryModel();
+    this._inventoryModel = new InventoryModel(9, 4);
 
     this._inventoryModel.addItem(BLOCK_TYPE.TORCH);
+    this._inventoryModel.addItem(BLOCK_TYPE.CACTUS);
+    this._inventoryModel.addItem(BLOCK_TYPE.COAL);
+    this._inventoryModel.addItem(BLOCK_TYPE.DEAD_BUSH);
+    this._inventoryModel.addItem(BLOCK_TYPE.LEAVES);
+    this._inventoryModel.addItem(BLOCK_TYPE.ROSE);
+    this._inventoryModel.addItem(BLOCK_TYPE.SANDSTONE);
+    this._inventoryModel.addItem(BLOCK_TYPE.GRASS);
+    this._inventoryModel.addItem(BLOCK_TYPE.WOOD);
 
     this._init();
   }
@@ -69,6 +77,8 @@ export default class Ui extends DisplayObject {
 
       // e.preventDefault();
     }
+
+    this._inventoryContainer.visible = true;
 
     inventoryBar.setItems(this._inventoryModel.items);
     inventoryBar.setSliderPosition(this._activeItemPos);

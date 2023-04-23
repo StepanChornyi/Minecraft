@@ -37,6 +37,8 @@ export default class ItemIcon extends DisplayObject {
       isPressed = true;
 
       this.parent.setChildIndex(this, this.parent.numChildren - 1);
+
+      this.post("pressed");
     });
 
     this.on("pointerUp", () => {
