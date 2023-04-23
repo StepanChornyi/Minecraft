@@ -123,6 +123,7 @@ export default class Shadow extends Mesh {
     gl.disable(gl.CULL_FACE);
 
     gl.enable(gl.BLEND);
+    gl.blendFunc(gl.ZERO, gl.SRC_COLOR);
     gl.colorMask(true, true, true, true);
 
     this.updateAttribPointers();
@@ -142,6 +143,9 @@ export default class Shadow extends Mesh {
     // gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, this.transformMatrix);
 
     gl.drawArrays(gl.POINTS, 0, this.vertices.length / 4);
+
+    gl.disable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ZERO);
   }
 
   updateAttribPointers() {
