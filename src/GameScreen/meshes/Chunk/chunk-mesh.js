@@ -189,6 +189,15 @@ export default class ChunkMesh extends Mesh {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
 
+    // const ext =
+    //   gl.getExtension("EXT_texture_filter_anisotropic") ||
+    //   gl.getExtension("MOZ_EXT_texture_filter_anisotropic") ||
+    //   gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic");
+    // if (ext) {
+    //   const max = gl.getParameter(ext.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+    //   gl.texParameteri(gl.TEXTURE_2D, ext.TEXTURE_MAX_ANISOTROPY_EXT, max);
+    // }
+
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.generateMipmap(gl.TEXTURE_2D);
     gl.bindTexture(gl.TEXTURE_2D, null);

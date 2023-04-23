@@ -3,10 +3,10 @@ import ResizeActionComponent from '../../libs/resize-action-component';
 import { BLOCK_TYPE } from '../block-type';
 import HELPERS from '../../utils/helpers';
 import DebugLog from './debug-log';
-import InventoryBar from './inventory-bar';
-import Inventory from './Inventory';
+import InventoryBar from './inventory/inventory-bar';
+import Inventory from './inventory/Inventory';
 import Overlay from './Overlay';
-import InventoryModel from './InventoryModel';
+import InventoryModel from './inventory/InventoryModel';
 
 export default class Ui extends DisplayObject {
   constructor() {
@@ -29,6 +29,7 @@ export default class Ui extends DisplayObject {
     this._inventoryModel.addItem(BLOCK_TYPE.SANDSTONE);
     this._inventoryModel.addItem(BLOCK_TYPE.GRASS);
     this._inventoryModel.addItem(BLOCK_TYPE.WOOD);
+    this._inventoryModel.addItem(BLOCK_TYPE.BEDROCK);
 
     this._init();
   }

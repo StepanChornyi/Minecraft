@@ -152,10 +152,11 @@ export default class WorldGenerator {
       }
     }
 
-    if (cave < -2) {//-3
-      // if (cave > -0.1) {
-      //   return BLOCK_TYPE.LEAVES;
-      // }
+    if (cave < 0) {//-3
+      if (cave > -0.1) {
+        return BLOCK_TYPE.LEAVES;
+      }
+  
 
       return BLOCK_TYPE.AIR;
     }

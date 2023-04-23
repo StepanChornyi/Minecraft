@@ -24,7 +24,7 @@ void main() {
   vec3 mapPos = mapData.xyz / mapData.w;
 
   if(distance(mapPos, viewPos) < 0.15) {
-    gl_FragColor = vec4(vec3(0.8),  1.0);
+    gl_FragColor = vec4(vec3(0.7),  1.0);
     return;
   }
 

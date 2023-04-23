@@ -1,4 +1,5 @@
 import { Rectangle, DisplayObject, Black, Sprite, Graphics, MessageDispatcher } from 'black-engine';
+import ItemIcon from './item-icon';
 
 export default class InventoryModel extends MessageDispatcher {
   constructor(cols, rows) {
@@ -16,7 +17,6 @@ export default class InventoryModel extends MessageDispatcher {
   }
 
   addItem(itemType) {
-
     for (let i = 0; i < this.slotsCount; i++) {
       const item = this._items[i];
 
@@ -56,6 +56,10 @@ export default class InventoryModel extends MessageDispatcher {
     this.post("change");
   }
 
+  indexOf(item) {
+    return this._items.indexOf(item);
+  }
+
   get items() {
     return this._items;
   }
@@ -73,9 +77,11 @@ export default class InventoryModel extends MessageDispatcher {
   }
 }
 
-class Item extends MessageDispatcher {
+export class Item extends MessageDispatcher {
   constructor(type) {
     super();
+
+    this._icon = new ItemIcon(type);
 
     this._type = type;
     this._count = Infinity;
@@ -83,5 +89,9 @@ class Item extends MessageDispatcher {
 
   get type() {
     return this._type;
+  }
+
+  get icon() {
+    return this._icon;
   }
 }

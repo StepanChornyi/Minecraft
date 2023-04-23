@@ -1,8 +1,8 @@
 import { Rectangle, DisplayObject, Black, Sprite, Graphics, Texture } from 'black-engine';
-import { BLOCK_TYPE } from '../block-type';
+import { BLOCK_TYPE } from '../../block-type';
 
 export default class ItemIcon extends DisplayObject {
-  constructor() {
+  constructor(type = BLOCK_TYPE.GRASS_BLOCK) {
     super();
 
     this.touchable = true;
@@ -12,48 +12,51 @@ export default class ItemIcon extends DisplayObject {
 
     this._icon = null;
 
-    this.setBlockType(BLOCK_TYPE.GRASS_BLOCK);
+    this.setType(type);
 
     this._init();
   }
 
-  setBlockType(blockType) {
-    this._updateTexture(blockType);
+  setType(type) {
+    this._updateTexture(type);
+
+    return this;
   }
 
   _init() {
     const icon = this._icon = new Sprite(this._texture);
 
     icon.scale = 0.85;
+
     icon.alignAnchor();
 
     this.add(icon);
 
-    icon.touchable = true;
+    // icon.touchable = true;
 
-    let isPressed = false;
+    // let isPressed = false;
 
-    this.on("pointerDown", () => {
-      isPressed = true;
+    // this.on("pointerDown", () => {
+    //   isPressed = true;
 
-      this.parent.setChildIndex(this, this.parent.numChildren - 1);
+    //   this.parent.setChildIndex(this, this.parent.numChildren - 1);
 
-      this.post("pressed");
-    });
+    //   this.post("pressed");
+    // });
 
-    this.on("pointerUp", () => {
-      isPressed = false;
-      this.post("released");
-    });
+    // this.on("pointerUp", () => {
+    //   isPressed = false;
+    //   this.post("released");
+    // });
 
-    Black.stage.on("pointerMove", () => {
-      if (isPressed) {
-        const local = this.parent.globalToLocal(Black.input.pointerPosition);
+    // Black.stage.on("pointerMove", () => {
+    //   if (isPressed) {
+    //     const local = this.parent.globalToLocal(Black.input.pointerPosition);
 
-        this.x = local.x;
-        this.y = local.y;
-      }
-    })
+    //     this.x = local.x;
+    //     this.y = local.y;
+    //   }
+    // })
   }
 
   _updateTexture(blockType) {

@@ -29,7 +29,7 @@ export default class InventoryBar extends DisplayObject {
 
       if (item) {
         icon.visible = true;
-        icon.setBlockType(item.type);
+        icon.setType(item.type);
       } else {
         icon.visible = false;
       }
