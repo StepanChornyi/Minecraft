@@ -4,18 +4,28 @@ import ItemIcon from './item-icon';
 import InventoryModel from './InventoryModel';
 import SlotsGroup from './SlotGroup';
 
-export default class InventoryCrafting extends FixedSizeDisplayObject {
+export default class CraftingSection extends FixedSizeDisplayObject {
   constructor() {
     super();
+
+    this._craftingModel = new InventoryModel(2, 2);
 
     this.touchable = true;
 
     this._init();
   }
 
+  slotHit(globalItemPos) {
+    return this._slotsGroupCraft.slotHit(globalItemPos);
+  }
+
+  addItem(item, slotIndex) {
+    this._slotsGroupCraft.addItem(item, slotIndex);
+  }
+
   _init() {
-    const slotsGroupCraft = new SlotsGroup(2, 2);
-    const slotsGroupCraftResult = new SlotsGroup(1, 1);
+    const slotsGroupCraft = this._slotsGroupCraft = new SlotsGroup(2, 2);
+    const slotsGroupCraftResult = this._slotsGroupCraftResult = new SlotsGroup(1, 1);
 
     slotsGroupCraft.x = 255;
     slotsGroupCraft.y = 69;

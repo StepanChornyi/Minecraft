@@ -13,11 +13,15 @@ export default class InventoryModel extends MessageDispatcher {
   }
 
   getItem(x, y) {
-    return  this.getItemByIndex(this.getSlotIndex(x, y));
+    return this.getItemByIndex(this.getSlotIndex(x, y));
   }
 
   getItemByIndex(index) {
     return this._items[index];
+  }
+
+  getItemIndex(item) {
+    return this._items.indexOf(item);
   }
 
   addItem(itemType) {
@@ -27,7 +31,9 @@ export default class InventoryModel extends MessageDispatcher {
       if (item && item.type === itemType) {
         item.count++;
 
-        return this.post("change");
+        this.post("change");
+
+        return i;
       }
     }
 
@@ -37,7 +43,9 @@ export default class InventoryModel extends MessageDispatcher {
       if (!item) {
         this._items[i] = new Item(itemType);
 
-        return this.post("change");
+        this.post("change");
+
+        return i;
       }
     }
   }
@@ -59,7 +67,7 @@ export default class InventoryModel extends MessageDispatcher {
 
     this.post("change");
 
-    if(this._items[index]){
+    if (this._items[index]) {
       this.post("itemMove", index);
     }
   }

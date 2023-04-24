@@ -18,19 +18,6 @@ export default class Ui extends DisplayObject {
 
     this._activeItemPos = 0;
 
-    this._inventoryModel = new InventoryModel(9, 4);
-
-    this._inventoryModel.addItem(BLOCK_TYPE.TORCH);
-    this._inventoryModel.addItem(BLOCK_TYPE.CACTUS);
-    // this._inventoryModel.addItem(BLOCK_TYPE.WATER);
-    this._inventoryModel.addItem(BLOCK_TYPE.DEAD_BUSH);
-    this._inventoryModel.addItem(BLOCK_TYPE.LEAVES);
-    this._inventoryModel.addItem(BLOCK_TYPE.ROSE);
-    this._inventoryModel.addItem(BLOCK_TYPE.SANDSTONE);
-    this._inventoryModel.addItem(BLOCK_TYPE.GRASS);
-    this._inventoryModel.addItem(BLOCK_TYPE.WOOD);
-    this._inventoryModel.addItem(BLOCK_TYPE.BEDROCK);
-
     this._init();
   }
 
@@ -43,7 +30,7 @@ export default class Ui extends DisplayObject {
   }
 
   collectItem(blockType) {
-    this._inventoryModel.addItem(blockType);
+    this._inventory.addItem(blockType);
   }
 
   _init() {
@@ -51,8 +38,24 @@ export default class Ui extends DisplayObject {
     const debugLog = this._debugLog = new DebugLog();
     const overlay = this._overlay = new Overlay(0);
     const inventoryOverlay = this._inventoryOverlay = new Overlay(0.6);
-    const inventory = this._inventory = new Inventory(this._inventoryModel);
+    const inventory = this._inventory = new Inventory();
     const inventoryContainer = this._inventoryContainer = new DisplayObject();
+
+    this._inventoryModel = inventory.getModel();
+
+    this._inventory.addItem(BLOCK_TYPE.TORCH);
+    this._inventory.addItem(BLOCK_TYPE.CACTUS);
+    // this._inventory.addItem(BLOCK_TYPE.WATER);
+    this._inventory.addItem(BLOCK_TYPE.DEAD_BUSH);
+    this._inventory.addItem(BLOCK_TYPE.LEAVES);
+    this._inventory.addItem(BLOCK_TYPE.ROSE);
+    this._inventory.addItem(BLOCK_TYPE.SANDSTONE);
+    this._inventory.addItem(BLOCK_TYPE.GRASS);
+    this._inventory.addItem(BLOCK_TYPE.WOOD);
+    this._inventory.addItem(BLOCK_TYPE.BEDROCK);
+    this._inventory.addItem(BLOCK_TYPE.STONE_BRICK);
+    this._inventory.addItem(BLOCK_TYPE.IRON);
+
 
     inventoryContainer.touchable = true;
     inventoryContainer.add(inventoryOverlay, inventory);
