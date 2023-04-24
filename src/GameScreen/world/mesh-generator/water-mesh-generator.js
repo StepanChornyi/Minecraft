@@ -125,26 +125,6 @@ export default class WaterMeshGenerator extends MeshGenerator {
 const CENTER_BLOCK_INDEX = 13;
 
 const blockData = {
-  top: {
-    normal: [0, 1, 0],
-    light: 1,
-    vertices: [
-      -1.0, 1.0, -1.0, 0, 0,
-      -1.0, 1.0, 1.0, 0, 1,
-      1.0, 1.0, 1.0, 1, 1,
-      1.0, 1.0, -1.0, 1, 0,
-    ],
-    triangles: {
-      default: [
-        0, 1, 2,
-        0, 2, 3,
-      ],
-      flipped: [
-        1, 2, 3,
-        1, 3, 0,
-      ]
-    }
-  },
   left: {
     normal: [-1, 0, 0],
     light: 0.95,
@@ -244,7 +224,27 @@ const blockData = {
         1, 3, 2,
       ]
     }
-  }
+  },
+  top: {
+    normal: [0, 1, 0],
+    light: 1,
+    vertices: [
+      -1.0, 1.0, -1.0, 0, 0,
+      -1.0, 1.0, 1.0, 0, 1,
+      1.0, 1.0, 1.0, 1, 1,
+      1.0, 1.0, -1.0, 1, 0,
+    ],
+    triangles: {
+      default: [
+        0, 1, 2,
+        0, 2, 3,
+      ],
+      flipped: [
+        1, 2, 3,
+        1, 3, 0,
+      ]
+    }
+  },
 };
 
 for (const key in blockData) {
