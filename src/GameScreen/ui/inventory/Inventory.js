@@ -69,6 +69,19 @@ export default class Inventory extends FixedSizeDisplayObject {
     slotsGroupTop.on("itemPressed", (_, item) => this._onItemPressed(item, slotsGroupTop));
 
     this.add(bg, slotsContainer, itemsContainer, itemDNDContainer);
+
+    this._model.on("itemMove", (_, index) => {
+      const item = this._model.getItemByIndex(index);
+
+      slotsGroupTop.removeItem(item);
+      slotsGroupBottom.removeItem(item);
+
+      if (index < slotsGroupTop.indexOffset) {
+        slotsGroupBottom.addItem(item, index);
+      } else {
+        slotsGroupTop.addItem(item, index - slotsGroupTop.indexOffset);
+      }
+    });
   }
 
   _onItemPressed(item, group) {
@@ -105,8 +118,6 @@ export default class Inventory extends FixedSizeDisplayObject {
   }
 
   onUpdate() {
-    console.log();
-
     if (!this.pressedItem)
       return;
 

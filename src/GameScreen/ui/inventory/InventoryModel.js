@@ -13,7 +13,11 @@ export default class InventoryModel extends MessageDispatcher {
   }
 
   getItem(x, y) {
-    return this._items[this.getSlotIndex(x, y)];
+    return  this.getItemByIndex(this.getSlotIndex(x, y));
+  }
+
+  getItemByIndex(index) {
+    return this._items[index];
   }
 
   addItem(itemType) {
@@ -54,6 +58,10 @@ export default class InventoryModel extends MessageDispatcher {
     this._items[newIndex] = item;
 
     this.post("change");
+
+    if(this._items[index]){
+      this.post("itemMove", index);
+    }
   }
 
   indexOf(item) {

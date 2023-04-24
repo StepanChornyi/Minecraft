@@ -125,7 +125,7 @@ export default class SlotsGroup extends FixedSizeDisplayObject {
   _createOverlay() {
     const overlay = new Graphics();
 
-    overlay.fillStyle(0xffffff, 0.5);
+    overlay.fillStyle(0xffffff, 0.3);
     overlay.beginPath();
     overlay.rect(-SLOT_INNER_SIZE * 0.5, -SLOT_INNER_SIZE * 0.5, SLOT_INNER_SIZE, SLOT_INNER_SIZE);
     overlay.closePath();
