@@ -25,7 +25,7 @@ export default class CustomAssetManager extends AssetManager {
     const xmlAssets = this.mAssets[AssetType.XHR];
 
     if (!xmlAssets || !xmlAssets[name]) {
-      Debug.warn(`XHR asset "${name}" not foun in cache`);
+      Debug.warn(`XHR asset "${name}" not found in cache`);
 
       return null;
     }
