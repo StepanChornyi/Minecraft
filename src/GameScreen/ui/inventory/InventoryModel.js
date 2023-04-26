@@ -12,18 +12,6 @@ export default class InventoryModel extends MessageDispatcher {
     this._items = [];
   }
 
-  getItem(x, y) {
-    return this.getItemByIndex(this.getSlotIndex(x, y));
-  }
-
-  getItemByIndex(index) {
-    return this._items[index];
-  }
-
-  getItemIndex(item) {
-    return this._items.indexOf(item);
-  }
-
   addItem(itemType) {
     for (let i = 0; i < this.slotsCount; i++) {
       const item = this._items[i];
@@ -72,16 +60,24 @@ export default class InventoryModel extends MessageDispatcher {
     }
   }
 
+  setItem(item, index) {
+    this._items[index] = item;
+  }
+
+  getItem(index) {
+    return this._items[index];
+  }
+
   indexOf(item) {
     return this._items.indexOf(item);
   }
 
-  get items() {
-    return this._items;
-  }
-
   getSlotIndex(x, y) {
     return y * this.cols + x;
+  }
+
+  get items() {
+    return this._items;
   }
 
   get itemsCols() {
@@ -105,6 +101,11 @@ export class Item extends MessageDispatcher {
 
   get type() {
     return this._type;
+  }
+
+  set type(val) {
+    this._type = val;
+    this._icon.setType(val);
   }
 
   get icon() {

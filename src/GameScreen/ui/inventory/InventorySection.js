@@ -31,10 +31,10 @@ export default class InventorySection extends FixedSizeDisplayObject {
 
   addItem(item, slotIndex) {
     if (slotIndex < 0) {
-      slotIndex = this._inventoryModel.getItemIndex(item);
+      slotIndex = this._inventoryModel.indexOf(item);
     }
 
-    this._inventoryModel.moveItem(this._inventoryModel.getItemIndex(item), slotIndex);
+    this._inventoryModel.moveItem(this._inventoryModel.indexOf(item), slotIndex);
   
     const group = this._getGroup(slotIndex);
 
@@ -52,7 +52,7 @@ export default class InventorySection extends FixedSizeDisplayObject {
 
   addItemByType(itemType) {
     const itemIndex = this._inventoryModel.addItem(itemType);
-    const item = this._inventoryModel.getItemByIndex(itemIndex);
+    const item = this._inventoryModel.getItem(itemIndex);
 
     this.addItem(item, itemIndex);
   }
