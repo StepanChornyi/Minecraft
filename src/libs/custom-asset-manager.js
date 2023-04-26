@@ -4,7 +4,9 @@ export default class CustomAssetManager extends AssetManager {
   constructor() {
     super();
 
-    Cache.enabled = false;
+    try {
+      Cache.enabled = false;
+    } catch (_) { }
 
     this.mGlTextures = {};
   }
