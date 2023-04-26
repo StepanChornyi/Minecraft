@@ -46,6 +46,7 @@ export default class Ui extends DisplayObject {
     this._inventory.addItem(BLOCK_TYPE.TORCH);
     this._inventory.addItem(BLOCK_TYPE.CACTUS);
     // this._inventory.addItem(BLOCK_TYPE.WATER);
+    this._inventory.addItem(BLOCK_TYPE.PLANKS);
     this._inventory.addItem(BLOCK_TYPE.DEAD_BUSH);
     this._inventory.addItem(BLOCK_TYPE.LEAVES);
     this._inventory.addItem(BLOCK_TYPE.ROSE);

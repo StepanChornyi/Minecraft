@@ -13,9 +13,9 @@ export default class StoneBrickBlock extends BaseBlock {
   update(world, pos) {
     const top = world.getBlock(pos.x, pos.y + 1, pos.z);
 
-    if (top.is(BLOCK_TYPE.SAND)) {
-      world.setBlock(pos.x, pos.y-1, pos.z, BlocksManager.create(BLOCK_TYPE.DIRT));
-    }
+    // if (top.is(BLOCK_TYPE.SAND)) {
+    //   world.setBlock(pos.x, pos.y-1, pos.z, BlocksManager.create(BLOCK_TYPE.DIRT));
+    // }
 
     // if (!top || top.transparency > 0) {
     //   this._needsUpdate = false;

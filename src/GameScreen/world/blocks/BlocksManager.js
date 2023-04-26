@@ -12,22 +12,12 @@ import WaterBlock from "./WaterBlock";
 
 const BLOCK_CLASSES = {};
 
-BLOCK_CLASSES[BLOCK_TYPE.AIR] = BaseBlock;
 BLOCK_CLASSES[BLOCK_TYPE.GRASS_BLOCK] = GrassBlock;
 BLOCK_CLASSES[BLOCK_TYPE.DIRT] = DirtBlock;
-BLOCK_CLASSES[BLOCK_TYPE.STONE] = BaseBlock;
-BLOCK_CLASSES[BLOCK_TYPE.COAL] = BaseBlock;
-BLOCK_CLASSES[BLOCK_TYPE.IRON] = BaseBlock;
-BLOCK_CLASSES[BLOCK_TYPE.WOOD] = BaseBlock;
-BLOCK_CLASSES[BLOCK_TYPE.BEDROCK] = BaseBlock;
-BLOCK_CLASSES[BLOCK_TYPE.COBBLESTONE] = BaseBlock;
 BLOCK_CLASSES[BLOCK_TYPE.STONE_BRICK] = StoneBrickBlock;
-BLOCK_CLASSES[BLOCK_TYPE.TORCH] = BaseBlock;
-BLOCK_CLASSES[BLOCK_TYPE.LEAVES] = BaseBlock;
 BLOCK_CLASSES[BLOCK_TYPE.GRASS] = GrassPlantBlock;
 BLOCK_CLASSES[BLOCK_TYPE.ROSE] = RosePlantBlock;
 BLOCK_CLASSES[BLOCK_TYPE.SAND] = SandBlock;
-BLOCK_CLASSES[BLOCK_TYPE.SANDSTONE] = BaseBlock;
 BLOCK_CLASSES[BLOCK_TYPE.DEAD_BUSH] = DeadBushBlock;
 BLOCK_CLASSES[BLOCK_TYPE.CACTUS] = CactusBlock;
 BLOCK_CLASSES[BLOCK_TYPE.WATER] = WaterBlock;
@@ -38,7 +28,7 @@ export default class BlocksManager {
   }
 
   static create(blockType) {
-    const BlockClass = BLOCK_CLASSES[blockType];
+    const BlockClass = BLOCK_CLASSES[blockType] || BaseBlock;
     const block = BlockClass.pool.pop() || new BlockClass(blockType);
 
     block.type = blockType;
@@ -49,6 +39,6 @@ export default class BlocksManager {
   static recycle(block) {
     block.reset();
 
-    BLOCK_CLASSES[block.type].pool.push(block);
+   ( BLOCK_CLASSES[block.type] || BaseBlock).pool.push(block);
   }
 }

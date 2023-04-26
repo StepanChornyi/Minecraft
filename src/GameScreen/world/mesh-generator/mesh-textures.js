@@ -55,6 +55,10 @@ MESH_TEXTURES[BLOCK_TYPE.WATER] = {
   all: 0
 };
 
+MESH_TEXTURES[BLOCK_TYPE.PLANKS] = {
+  all: 26
+};
+
 const BLOCKS_PER_ROW = 8;
 
 for (const blockType in MESH_TEXTURES) {
