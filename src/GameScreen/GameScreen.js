@@ -23,6 +23,7 @@ import FrameBuffer from '../Utils3D/FrameBuffer';
 import Quad from './meshes/Quad/Quad';
 import Shadow from './meshes/shadow/Shadow';
 import ChunkMesh from './meshes/Chunk/chunk-mesh';
+import ThickSprite from './meshes/thickSprite/ThickSprite';
 
 const canvas = document.getElementById("canvas3D");
 const gl = WEBGL_UTILS.getWebGlContext(canvas);
@@ -59,6 +60,9 @@ export default class GameScreen extends DisplayObject {
     this.blockk = new Blockk(gl, this.world);
     this.particles = new ParticlesMesh(gl, this.world);
     this.shadow = new Shadow(gl);
+    this.thickSprite = new ThickSprite(gl);
+
+    this.thickSprite.y = 26;
 
 
     this.particles.texture = ChunkMesh._initTexture(gl);
@@ -283,6 +287,8 @@ export default class GameScreen extends DisplayObject {
 
     this.particles.render(camera);
 
+    this.thickSprite.render(camera);
+
     for (let i = 0; i < world.chunks.length; i++) {
       const chunk = world.chunks[i];
 
@@ -319,6 +325,10 @@ export default class GameScreen extends DisplayObject {
     this.player.onUpdate(dt);
 
     this.skyMesh.position = this.player.position;
+
+    this.thickSprite.x = this.player.x
+    this.thickSprite.y = this.player.y +0.5
+    this.thickSprite.z = this.player.z -1.5
 
     const entities = [];
 
