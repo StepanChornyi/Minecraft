@@ -17,13 +17,15 @@ let textureCanvas = null;
 let textureCanvasCtx = null;
 
 export default class ThickSprite extends Mesh {
-  constructor(gl_context, _program) {
+  constructor(gl_context, type = BLOCK_TYPE.DEAD_BUSH) {
     gl = gl_context;
-    program = _program || WEBGL_UTILS.createProgram(gl, vs, fs);
+    program = program || WEBGL_UTILS.createProgram(gl, vs, fs);
 
     ThickSprite._initTexture();
 
     super(gl, program);
+
+    this._type = type;
 
     this.init();
     this.drawBuffersData();
@@ -45,7 +47,7 @@ export default class ThickSprite extends Mesh {
     const thickness = size / 16;
     let indexOffset = 0;
 
-    const [u, v] = MESH_TEXTURES[BLOCK_TYPE.DEAD_BUSH].all;
+    const [u, v] = MESH_TEXTURES[this._type].all;
 
     for (let z = 0; z <= 1; z++) {
       for (let y = 0; y <= 1; y++) {
@@ -65,7 +67,7 @@ export default class ThickSprite extends Mesh {
       indexOffset += 4;
     }
 
-    const contour = this._getContour();
+    const contour = this._getContour(u, v);
     const th = (thickness) * 2;
 
     for (let i = 0; i < contour.length; i++) {
@@ -125,9 +127,8 @@ export default class ThickSprite extends Mesh {
     }
   }
 
-  _getContour() {
+  _getContour(u, v) {
     const contour = [];
-    const [u, v] = MESH_TEXTURES[BLOCK_TYPE.DEAD_BUSH].all;
 
     const spriteX = MeshGenerator.textureCoord(u, 0) * textureCanvas.width;
     const spriteY = MeshGenerator.textureCoord(v, 0) * textureCanvas.height;
@@ -269,7 +270,7 @@ export default class ThickSprite extends Mesh {
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
     gl.generateMipmap(gl.TEXTURE_2D);

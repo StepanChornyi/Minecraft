@@ -16,6 +16,7 @@ import MESH_TEXTURES from '../../world/mesh-generator/mesh-textures';
 import vs from './drop.vs.glsl';
 import fs from './drop.fs.glsl';
 import MathUtils from '../../../utils/MathUtils';
+import ThickSprite from '../../meshes/thickSprite/ThickSprite';
 
 let gl = null;
 let program = null;
@@ -31,6 +32,12 @@ let matViewUniformLocation;
 let matProjUniformLocation;
 
 const size = new Vector3(0.3, 0.5, 0.3);
+
+const sprites = [
+  BLOCK_TYPE.DEAD_BUSH,
+  BLOCK_TYPE.ROSE,
+  BLOCK_TYPE.GRASS,
+];
 
 export default class Drop extends Mesh {
   constructor(_gl, world, blockType = BLOCK_TYPE.SAND, player) {
@@ -71,6 +78,10 @@ export default class Drop extends Mesh {
 
     this.isDestroyed = false;
     this.snapped = false;
+
+    if (sprites.includes(blockType)) {
+      this._thickSprite = new ThickSprite(gl, blockType);
+    }
 
     this._init();
   }
@@ -132,9 +143,20 @@ export default class Drop extends Mesh {
     this._shadow.x = this.x;
     this._shadow.y = this.y - size.y * 0.5;
     this._shadow.z = this.z;
+
+    if (this._thickSprite) {
+      this._thickSprite.x = this.x;
+      this._thickSprite.y = this.y;
+      this._thickSprite.z = this.z;
+    }
   }
 
   render(camera) {
+    if (this._thickSprite) {
+      this._thickSprite.render(camera);
+      return;
+    }
+
     gl.useProgram(program);
 
     gl.enable(gl.DEPTH_TEST);
