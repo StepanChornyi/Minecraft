@@ -41,71 +41,88 @@ export default class ThickSprite extends Mesh {
   }
 
   init() {
-    const size = 1;
+    const size = 0.2;
     const thickness = size / 16;
     let indexOffset = 0;
 
     const [u, v] = MESH_TEXTURES[BLOCK_TYPE.DEAD_BUSH].all;
 
-    for (let z = 0; z <= 1; z++, indexOffset += 4) {
+    for (let z = 0; z <= 1; z++) {
       for (let y = 0; y <= 1; y++) {
         for (let x = 0; x <= 1; x++) {
           this.vertices.push(
             (x * 2 - 1) * size,
             (y * 2 - 1) * size,
-            (z * 2 - 1) * thickness,
+            (z * 2 - 1) * (thickness - 0.0001),
             MeshGenerator.textureCoord(u, 1 - x),
-            MeshGenerator.textureCoord(v, 1 - y)
+            MeshGenerator.textureCoord(v, 1 - y),
+            0.9
           );
         }
       }
 
-      this._addIndicesQuad(indexOffset);
+      this._addIndicesQuad(indexOffset, z === 0);
+      indexOffset += 4;
     }
 
     const contour = this._getContour();
-    const th = thickness + 0.01;
+    const th = (thickness) * 2;
 
-    for (let i = 0; i < contour.length; i++, indexOffset += 4) {
+    for (let i = 0; i < contour.length; i++) {
       const { x, y, normalX, normalY } = contour[i];
 
-      for (let yy = 0; yy <= 1; yy++) {
-        for (let xx = 0; xx <= 1; xx++) {
-          let offX = 0, offY = 0, offZ = 0;
+      for (let i = 0; i <= 1; i++) {
+        for (let j = 0; j <= 1; j++) {
+          let offX = 0, offY = 0, offZ = 0, light = 1;
 
-          // if (normalX < 0) {
-          //   offY = (xx) * th;
-          //   offZ = (yy) * th;
-          // } else if (normalX > 0) {
-          //   offX = 0;
-          //   offY = (xx) * th;
-          //   offZ = (yy) * th;
-          // } else if (normalY < 0) {
-            offX = (xx) * th;
-            offZ = (yy) * th;
-          // } else {
-          //   offX = (xx) * th;
-          //   offZ = (yy) * th;
-          //   offY = th;
-          // }
+          if (normalX < 0) {
+            offX = 0;
+            offZ = (j - 0.5) * th;
+            offY = i * th;
+            light = 0.8;
+          } else if (normalX > 0) {
+            offX = th;
+            offZ = (j - 0.5) * th;
+            offY = i * th;
+            light = 0.8;
+          } else if (normalY < 0) {
+            offX = i * th;
+            offZ = (j - 0.5) * th;
+            offY = 0;
+            light = 1;
+          } else {
+            offX = i * th;
+            offZ = (j - 0.5) * th;
+            offY = th;
+            light = 0.7;
+          }
+
+          const xx = size * (1 - x * 2);
+          const yy = size * (1 - y * 2);
 
           this.vertices.push(
-            (1-x) * size*2 + offX - size,
-            (1-y) * size*2 + offY - size,
-            offZ - 0.5 * th,
-            MeshGenerator.textureCoord(u, x),
-            MeshGenerator.textureCoord(v, y)
+            xx - offX,
+            yy - offY,
+            - offZ,
+            MeshGenerator.textureCoord(u, x + 0.5 / 16),
+            MeshGenerator.textureCoord(v, y + 0.5 / 16),
+            light
           );
         }
       }
 
-      this._addIndicesQuad(indexOffset);
+      this._addIndicesQuad(indexOffset, normalX < 0 || normalY > 0);
 
+      indexOffset += 4
     }
   }
 
-  _addIndicesQuad(offset) {
-    this.indices.push(0 + offset, 1 + offset, 2 + offset, 1 + offset, 2 + offset, 3 + offset);
+  _addIndicesQuad(o, cullFaceFlip = false) {
+    if (cullFaceFlip) {
+      this.indices.push(1 + o, 0 + o, 2 + o, 1 + o, 2 + o, 3 + o);
+    } else {
+      this.indices.push(0 + o, 1 + o, 2 + o, 2 + o, 1 + o, 3 + o);
+    }
   }
 
   _getContour() {
@@ -114,8 +131,8 @@ export default class ThickSprite extends Mesh {
 
     const spriteX = MeshGenerator.textureCoord(u, 0) * textureCanvas.width;
     const spriteY = MeshGenerator.textureCoord(v, 0) * textureCanvas.height;
-    const spriteWidth = MeshGenerator.textureCoord(u, 1) * textureCanvas.width - spriteX;
-    const spriteHeight = MeshGenerator.textureCoord(v, 1) * textureCanvas.height - spriteY;
+    const spriteWidth = Math.ceil(MeshGenerator.textureCoord(u, 1) * textureCanvas.width - spriteX);
+    const spriteHeight = Math.ceil(MeshGenerator.textureCoord(v, 1) * textureCanvas.height - spriteY);
 
     const imageData = textureCanvasCtx.getImageData(spriteX, spriteY, spriteWidth, spriteHeight);
 
@@ -172,13 +189,13 @@ export default class ThickSprite extends Mesh {
     gl.useProgram(program);
 
     gl.enable(gl.DEPTH_TEST);
-    gl.disable(gl.CULL_FACE)
+    gl.enable(gl.CULL_FACE)
 
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.activeTexture(gl.TEXTURE0);
 
     gl.colorMask(true, true, true, false);
-    gl.disable(gl.BLEND);
+    gl.enable(gl.BLEND);
 
     this.updateAttribPointers();
 
@@ -202,6 +219,7 @@ export default class ThickSprite extends Mesh {
 
     const positionAttribLocation = gl.getAttribLocation(program, 'vertPosition');
     const uvAttribLocation = gl.getAttribLocation(program, 'vertUv');
+    const qq = gl.getAttribLocation(program, 'qq');
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.vertexBuffer);
 
@@ -210,7 +228,7 @@ export default class ThickSprite extends Mesh {
       3,
       gl.FLOAT,
       gl.FALSE,
-      5 * Float32Array.BYTES_PER_ELEMENT,
+      6 * Float32Array.BYTES_PER_ELEMENT,
       0
     );
 
@@ -219,12 +237,22 @@ export default class ThickSprite extends Mesh {
       2,
       gl.FLOAT,
       gl.FALSE,
-      5 * Float32Array.BYTES_PER_ELEMENT,
+      6 * Float32Array.BYTES_PER_ELEMENT,
       3 * Float32Array.BYTES_PER_ELEMENT
+    );
+
+    gl.vertexAttribPointer(
+      qq,
+      1,
+      gl.FLOAT,
+      gl.FALSE,
+      6 * Float32Array.BYTES_PER_ELEMENT,
+      5 * Float32Array.BYTES_PER_ELEMENT
     );
 
     gl.enableVertexAttribArray(positionAttribLocation);
     gl.enableVertexAttribArray(uvAttribLocation);
+    gl.enableVertexAttribArray(qq);
   }
 
   static _initTexture() {

@@ -164,7 +164,7 @@ export default class GameScreen extends DisplayObject {
       const drop = new Drop(gl, this.world, block.type, player);
       const dropShadow = this.shadow.addShadow();
 
-      dropShadow.r =500;
+      dropShadow.r = 500;
 
       drop.attachShadow(dropShadow)
 
@@ -327,8 +327,8 @@ export default class GameScreen extends DisplayObject {
     this.skyMesh.position = this.player.position;
 
     this.thickSprite.x = this.player.x
-    this.thickSprite.y = this.player.y +0.5
-    this.thickSprite.z = this.player.z -1.5
+    this.thickSprite.y = this.player.y + 0.5
+    this.thickSprite.z = this.player.z - 0.5
 
     const entities = [];
 
