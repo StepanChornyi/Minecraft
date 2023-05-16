@@ -64,9 +64,10 @@ export default class GameScreen extends DisplayObject {
 
 
     this.frameBuffer = new FrameBuffer(gl);
+    this.frameBufferShadow = new FrameBuffer(gl);
     this.quad = new Quad(gl);
 
-    this.quad.texture = this.frameBuffer.renderBuffer;
+    this.frameBufferShadow.isCompressed = true;
 
     this.entities = [];
 
@@ -237,13 +238,11 @@ export default class GameScreen extends DisplayObject {
     this._frameTime = performance.now() - this._lastFrameTime;
     this._lastFrameTime = performance.now();
 
-    this.skyMesh.render(camera);
-
     // const intersection = this.castRayFromCamera();
 
     // const { chunkX, chunkZ, blockX, blockZ } = intersection ? world.getChunkCoord(intersection[0], intersection[2]) : {};
 
-    this.frameBuffer.bind()
+    this.frameBufferShadow.bind()
 
     for (let i = 0; i < world.chunks.length; i++) {
       const chunk = world.chunks[i];
@@ -258,8 +257,11 @@ export default class GameScreen extends DisplayObject {
 
     }
 
-    this.frameBuffer.unbind();
+    this.frameBufferShadow.unbind();
 
+    this.frameBuffer.bind();
+
+    this.skyMesh.render(camera);
 
     for (let i = 0; i < world.chunks.length; i++) {
       const chunk = world.chunks[i];
@@ -274,7 +276,7 @@ export default class GameScreen extends DisplayObject {
 
     }
 
-    this.shadow.texture = this.frameBuffer.renderBuffer;
+    this.shadow.texture = this.frameBufferShadow.renderBuffer;
 
     // this.quad.render(camera);
 
@@ -305,6 +307,12 @@ export default class GameScreen extends DisplayObject {
     if (this.selectedBlock.visible) {
       this.selectedBlock.render(camera);
     }
+
+    this.frameBuffer.unbind();
+
+    this.quad.texture = this.frameBuffer.renderBuffer;
+
+    this.quad.render(camera);
 
     this.cursor.render(camera);
   }
@@ -412,7 +420,8 @@ export default class GameScreen extends DisplayObject {
 
     this.camera.aspect = canvas.width / canvas.height;
 
-    this.frameBuffer.setSize(canvas.width, canvas.height, 0.5);
+    this.frameBuffer.setSize(canvas.width, canvas.height, 1);
+    this.frameBufferShadow.setSize(canvas.width, canvas.height, 0.5);
   }
 }
 

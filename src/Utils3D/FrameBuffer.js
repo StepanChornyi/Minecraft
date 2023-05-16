@@ -27,6 +27,8 @@ export default class FrameBuffer {
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.bindTexture(gl.TEXTURE_2D, null);
+
+    this.isCompressed = false;
   }
 
   bind(clear = true) {
@@ -56,7 +58,12 @@ export default class FrameBuffer {
     this.height = height;
 
     gl.bindTexture(gl.TEXTURE_2D, this.renderBuffer);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG8, width, height, 0, gl.RG, gl.UNSIGNED_BYTE, null);
+
+    if (this.isCompressed) {
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RG8, width, height, 0, gl.RG, gl.UNSIGNED_BYTE, null);
+    } else {
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    }
 
     gl.bindRenderbuffer(gl.RENDERBUFFER, this.depthBuffer);
     gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
