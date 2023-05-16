@@ -148,6 +148,7 @@ export default class Drop extends Mesh {
       this._thickSprite.x = this.x;
       this._thickSprite.y = this.y;
       this._thickSprite.z = this.z;
+      this._thickSprite.rotationY = this.rotationY;
     }
   }
 

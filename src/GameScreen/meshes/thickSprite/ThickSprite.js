@@ -202,8 +202,6 @@ export default class ThickSprite extends Mesh {
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
 
-    this.rotationY += 0.01;
-
     const matWorldUniformLocation = gl.getUniformLocation(this.program, 'mWorld');
     const matViewUniformLocation = gl.getUniformLocation(this.program, 'mView');
     const matProjUniformLocation = gl.getUniformLocation(this.program, 'mProj');
