@@ -44,6 +44,8 @@ node_modules
 node_modules/*
 build
 build/*
+ref
+ref/*
 bak
 dist
 tmp

@@ -152,11 +152,11 @@ export default class WorldGenerator {
       }
     }
 
-    if (cave < 0) {//-3
-      if (cave > -0.1) {
-        return BLOCK_TYPE.LEAVES;
-      }
-  
+    if (cave < -5 * (0 + y / heightNoise)) {//-3
+      // if (cave > -0.1) {
+      //   return BLOCK_TYPE.LEAVES;
+      // }
+
 
       return BLOCK_TYPE.AIR;
     }
@@ -181,7 +181,15 @@ export default class WorldGenerator {
 
     const w = this.getWorley(x, y, z);
 
-    if (w < 0.016) {
+    if (y === 1 && (w*135)%1.135 < 0.002) {
+      return BLOCK_TYPE.WATER;
+    }
+
+    if ((w*999)%1.8436  < 0.016) {
+      return BLOCK_TYPE.COAL;
+    }
+
+    if (w < 0.01) {
       return BLOCK_TYPE.IRON;
     }
 

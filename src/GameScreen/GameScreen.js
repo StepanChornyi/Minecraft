@@ -39,6 +39,7 @@ export default class GameScreen extends DisplayObject {
 
     this.touchable = true;
 
+    // Black.audio.masterVolume = 0;
 
 
     // console.log(gl.getSupportedExtensions());
@@ -395,7 +396,7 @@ export default class GameScreen extends DisplayObject {
   }
 
   castRayFromCamera() {
-    const castRange = 15;
+    const castRange = 12;
     const a = Vector3.new().fromArr3(this.camera.position);
     const b = Vector3.new()
       .fromArr3(this.camera.direction)
@@ -420,7 +421,7 @@ export default class GameScreen extends DisplayObject {
 
     this.camera.aspect = canvas.width / canvas.height;
 
-    this.frameBuffer.setSize(canvas.width, canvas.height, 1);
+    this.frameBuffer.setSize(canvas.width, canvas.height, 1.3);
     this.frameBufferShadow.setSize(canvas.width, canvas.height, 0.5);
   }
 }

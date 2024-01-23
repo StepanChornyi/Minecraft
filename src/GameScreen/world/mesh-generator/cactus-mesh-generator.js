@@ -38,9 +38,9 @@ export default class CactusMeshGenerator extends MeshGenerator {
 
         mesh.vertices[i + 6] = chunk.getBlockIndex(x, y, z);
 
-        vertNormal[0] = mesh.vertices[i];
-        vertNormal[1] = mesh.vertices[i + 1];
-        vertNormal[2] = mesh.vertices[i + 2];
+        vertNormal[0] = clamp(-1, 1, mesh.vertices[i] * 1000);
+        vertNormal[1] = clamp(-1, 1, mesh.vertices[i + 1] * 1000);
+        vertNormal[2] = clamp(-1, 1, mesh.vertices[i + 2] * 1000);
 
         let { lb, ls, ao } = this.getVertexLight(blocks, data.normal, vertNormal, sideBlock);
 
@@ -49,19 +49,10 @@ export default class CactusMeshGenerator extends MeshGenerator {
         cornerAo.push(mesh.vertices[i + 5]);
 
         // mesh.vertices[i + 5] = Math.max(0, Math.min(1, mesh.vertices[i + 5]));
-        let fx = 1;
-        let fy = 1;
-        let fz = 1;
 
-        if (data.normal[0] !== 0) {
-          fx = 7 / 8 - 0.001;
-        } else if (data.normal[2] !== 0) {
-          fz = 7 / 8 - 0.001;
-        }
-
-        mesh.vertices[i] = (mesh.vertices[i] * fx + 1) * 0.5 + x;
-        mesh.vertices[i + 1] = (mesh.vertices[i + 1] * fy + 1) * 0.5 + y;
-        mesh.vertices[i + 2] = (mesh.vertices[i + 2] * fz + 1) * 0.5 + z;
+        mesh.vertices[i] = (mesh.vertices[i] + 1) * 0.5 + x;
+        mesh.vertices[i + 1] = (mesh.vertices[i + 1] + 1) * 0.5 + y;
+        mesh.vertices[i + 2] = (mesh.vertices[i + 2] + 1) * 0.5 + z;
       }
 
       const triangles = ((cornerAo[0] + cornerAo[2]) < (cornerAo[1] + cornerAo[3])) ? data.triangles.flipped : data.triangles.default;
@@ -227,8 +218,17 @@ for (const key in blockData) {
 
   blockData[key].triangles.flipped = blockData[key].triangles.flipped || blockData[key].triangles.default;
 
-  for (let i = 0; i < blockData[key].vertices.length; i += MeshGenerator.floatsPerVertice) {
-    blockData[key].vertices.splice(i + 5, 0, blockData[key].light);
-    blockData[key].vertices.splice(i + 6, 0, 0);
+  const vertices = blockData[key].vertices;
+  const normal = blockData[key].normal;
+
+  for (let i = 0; i < vertices.length; i += MeshGenerator.floatsPerVertice) {
+    vertices.splice(i + 5, 0, blockData[key].light);
+    vertices.splice(i + 6, 0, 0);
+
+    if (normal[0] !== 0) {
+      vertices[i] *= 7 / 8;
+    } else if (normal[2] !== 0) {
+      vertices[i + 2] *= 7 / 8;
+    }
   }
 }

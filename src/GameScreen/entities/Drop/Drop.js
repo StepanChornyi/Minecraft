@@ -17,6 +17,8 @@ import vs from './drop.vs.glsl';
 import fs from './drop.fs.glsl';
 import MathUtils from '../../../utils/MathUtils';
 import ThickSprite from '../../meshes/thickSprite/ThickSprite';
+import CactusMeshGenerator from '../../world/mesh-generator/cactus-mesh-generator';
+import TorchMeshGenerator from '../../world/mesh-generator/torch-mesh-generator';
 
 let gl = null;
 let program = null;
@@ -38,6 +40,11 @@ const sprites = [
   BLOCK_TYPE.ROSE,
   BLOCK_TYPE.GRASS,
 ];
+
+const specialMeshGenerators = {
+  [BLOCK_TYPE.TORCH]: TorchMeshGenerator,
+  [BLOCK_TYPE.CACTUS]: CactusMeshGenerator,
+};
 
 export default class Drop extends Mesh {
   constructor(_gl, world, blockType = BLOCK_TYPE.SAND, player) {
@@ -233,7 +240,7 @@ export default class Drop extends Mesh {
   }
 
   _init() {
-    const blockData = BlockMeshGenerator.blockData;
+    const blockData = (specialMeshGenerators[this.blockType] || BlockMeshGenerator).blockData;
     const blockType = this.blockType;
     const textureConfig = MESH_TEXTURES[blockType] || { all: [1000, 1000] };
 
@@ -273,8 +280,10 @@ export default class Drop extends Mesh {
         this.vertices[i + 2] = (this.vertices[i + 2]) * 0.5 * scale;
       }
 
-      for (let i = 0; i < data.triangles.default.length; i++) {
-        this.indices.push(data.triangles.default[i] + elementIndexOffset);
+      const triangles = data.triangles.default || data.triangles;
+
+      for (let i = 0; i < triangles.length; i++) {
+        this.indices.push(triangles[i] + elementIndexOffset);
       }
     }
 

@@ -15,6 +15,14 @@ gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+var ext = (
+  gl.getExtension('EXT_texture_filter_anisotropic') ||
+  gl.getExtension('MOZ_EXT_texture_filter_anisotropic') ||
+  gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic')
+);
+
+
+console.log(ext);
 export class Game extends DisplayObject {
   constructor() {
     super();

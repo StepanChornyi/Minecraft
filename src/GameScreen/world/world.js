@@ -346,8 +346,17 @@ export default class World extends MessageDispatcher {
 
     ///TODO - optimize this piece of shit
     for (let i = 0; i < this.chunks.length; i++) {
-      for (let j = 0; j < this.chunks[i].subChunks.length; j++) {
-        const subChunk = this.chunks[i].subChunks[j];
+      const chunk = this.chunks[i];
+
+      const dx = Math.abs((chunk.x + 0.5) * CONFIG.CHUNK_SIZE - this.player.x);
+      const dz = Math.abs((chunk.z + 0.5) * CONFIG.CHUNK_SIZE - this.player.z);
+
+      if (dx > (CONFIG.CHUNK_SIZE) || dz > (CONFIG.CHUNK_SIZE)) {
+        continue;
+      }
+
+      for (let j = 0; j < chunk.subChunks.length; j++) {
+        const subChunk = chunk.subChunks[j];
 
         for (let k = 0; k < subChunk.blocks.length; k++) {
           if (subChunk.blocks[k].needsUpdate) {

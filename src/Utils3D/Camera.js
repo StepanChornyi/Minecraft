@@ -3,7 +3,7 @@ import Ray from './Ray';
 const mat4 = glMatrix.mat4;
 
 export default class Camera extends Ray {
-  constructor(fov = Math.PI * 0.55, aspect = 1, near = 0.1, far = 1000) {
+  constructor(fov = Math.PI * 0.5, aspect = 1, near = 0.1, far = 1000) {
     super();
     
     this._fov = fov;

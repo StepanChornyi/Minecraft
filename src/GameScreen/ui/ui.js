@@ -74,8 +74,8 @@ export default class Ui extends DisplayObject {
     // });
 
     document.onkeydown = (e) => {
-      if (e.keyCode === 69)
-        this.switchInventory();
+      // if (e.keyCode === 69)
+      //   this.switchInventory();
 
       // if (e.keyCode === 27)
       //   this.switchInventory(true);
@@ -83,7 +83,7 @@ export default class Ui extends DisplayObject {
       // e.preventDefault();
     }
 
-    this._inventoryContainer.visible = true;
+    this._inventoryContainer.visible = false;
 
     inventoryBar.setItems(this._inventoryModel.items);
     inventoryBar.setSliderPosition(this._activeItemPos);
